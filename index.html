@@ -303,16 +303,17 @@ table.rt{width:100%;border-collapse:collapse;font-size:14px}
    "modo local" (los datos se guardan solo en este navegador).
    ===================================================================== */
 const FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  databaseURL: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyD7n2V_YEilbtTBFHEt8k_YG-RQwujZ2-A",
+  authDomain: "contralora.firebaseapp.com",
+  databaseURL: "https://contralora-default-rtdb.firebaseio.com",
+  projectId: "contralora",
+  storageBucket: "contralora.firebasestorage.app",
+  messagingSenderId: "283826130573",
+  appId: "1:283826130573:web:d6c88497d7504b6567dcc4"
 };
 const ROOT = 'inventario';           // carpeta raíz dentro de Realtime Database
 const H5Q = 'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';
+const XLSXJS = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
 
 /* ---------- Catálogos ---------- */
 const ESTADOS=['Bueno','Regular','Malo'];
@@ -325,6 +326,7 @@ const NEC_TIPOS=['Mantenimiento','Reparación','Adecuación','Adquisición','Otr
 const PRIORIDADES=['Alta','Media','Baja'];
 const NEC_ESTADOS=['Pendiente','En proceso','Atendida'];
 const UNIDADES=['piezas','cajas','paquetes','juegos','resmas','rollos','botes','litros','kilos','metros'];
+const MOTIVOS_BAJA=['Dañado sin posibilidad de reparación','Ya no funciona','Obsoleto','Desgaste por uso','Extravío','Robo','Otro'];
 const ROLES={admin:'Administrador (Contraloría)',responsable:'Responsable de espacio',consulta:'Solo consulta'};
 const PE={Bueno:'g',Regular:'a',Malo:'r'}, PS={'En uso':'g','En reparación':'a','Dañado':'r','Faltante':'p','Baja':'n'}, PF={'Sí':'g','No':'r'}, PP={Alta:'r',Media:'a',Baja:'n'}, PN={Pendiente:'r','En proceso':'a',Atendida:'g'};
 
@@ -349,8 +351,10 @@ function toast(msg,cls=''){const d=document.createElement('div');d.className=cls
 function readForm(f){const o={};$$('[name]',f).forEach(el=>{if(el.name.startsWith('__')||el.type==='file')return;if(el.type==='checkbox')o[el.name]=el.checked;else if(el.type==='number')o[el.name]=el.value===''?'':Number(el.value);else o[el.name]=el.value.trim()});return o}
 function dl(name,content,type='text/plain'){const b=new Blob([content],{type});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
 function beep(ok=true){try{const A=window._ac||(window._ac=new(window.AudioContext||window.webkitAudioContext)());const o=A.createOscillator(),g=A.createGain();o.frequency.value=ok?1046:220;o.type=ok?'sine':'square';g.gain.setValueAtTime(.18,A.currentTime);g.gain.exponentialRampToValueAtTime(.001,A.currentTime+(ok?.18:.35));o.connect(g).connect(A.destination);o.start();o.stop(A.currentTime+(ok?.18:.35));if(navigator.vibrate)navigator.vibrate(ok?60:[80,60,80])}catch(e){}}
-function compressImg(file,max=640){return new Promise((ok,ko)=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,max/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/jpeg',.72))};im.onerror=ko;im.src=r.result};r.onerror=ko;r.readAsDataURL(file)})}
-function loadScript(src){return new Promise((ok,ko)=>{if($(`script[src="${src}"]`)&&window.Html5Qrcode)return ok();const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>ko(new Error('No se pudo cargar el lector de QR. Revisa tu conexión.'));document.head.append(s)})}
+function compressImg(file,max=480){return new Promise((ok,ko)=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const sc=Math.min(1,max/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
+ const webp=c.toDataURL('image/webp',.5).startsWith('data:image/webp');let q=.6,out;do{out=c.toDataURL(webp?'image/webp':'image/jpeg',q);q-=.1}while(out.length>40000&&q>.25);ok(out)};im.onerror=()=>ko(new Error('No se pudo leer la imagen'));im.src=r.result};r.onerror=ko;r.readAsDataURL(file)})}
+const kb=d=>Math.round((d||'').length*0.75/1024);
+function loadScript(src,g='Html5Qrcode'){return new Promise((ok,ko)=>{if(window[g])return ok();const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>ko(new Error('No se pudo cargar un componente. Revisa tu conexión a internet.'));document.head.append(s)})}
 
 /* ---------- QR ---------- */
 function qrSVG(text){
@@ -392,7 +396,7 @@ const DB={
  async reserve(p,n){if(this.mode==='local'){const c=this._lget(p)||0;this._lset(p,c+n);this.save();return c+1}const r=await this.ref(p).transaction(c=>(c||0)+n);return r.snapshot.val()-n+1}
 };
 
-function cfg(){const c=S.config||{};return{escuela:'Escuela Secundaria General "21 de Noviembre"',escCorto:'Sec. Gral. 21 de Noviembre',cct:'',direccion:'Esquipulas, Santa Cruz Xoxocotlán, Oaxaca',ciclo:'2026-2027',prefijo:'BM',urlBase:/^https?:/.test(location.href)?location.origin+location.pathname:'',qrModo:'url',contraloria:'',recibeNombre:'Profr. Melchor Sánchez Monjaraz',recibeCargo:'Subdirector Encargado',voboNombre:'Profr. Juan Gabriel Armas Castillo',voboCargo:'Subdirector del Turno Mixto',etiqTam:'M',...c,categorias:(c.categorias&&c.categorias.length)?c.categorias:CATS_DEF}}
+function cfg(){const c=S.config||{};return{escuela:'Escuela Secundaria General "21 de Noviembre"',escCorto:'Sec. Gral. 21 de Noviembre',cct:'',direccion:'Esquipulas, Santa Cruz Xoxocotlán, Oaxaca',ciclo:'2026-2027',prefijo:'BM',serPrefijo:'SG21',urlBase:/^https?:/.test(location.href)?location.origin+location.pathname:'',qrModo:'url',contraloria:'',recibeNombre:'Profr. Melchor Sánchez Monjaraz',recibeCargo:'Subdirector Encargado',voboNombre:'Profr. Juan Gabriel Armas Castillo',voboCargo:'Subdirector del Turno Mixto',etiqTam:'M',...c,categorias:(c.categorias&&c.categorias.length)?c.categorias:CATS_DEF}}
 
 /* ---------- Permisos ---------- */
 const isAdmin=()=>ME?.rol==='admin';
@@ -412,6 +416,7 @@ const espName=id=>S.espacios[id]?.nombre||'Sin asignar';
 const respName=id=>S.responsables[id]?.nombre||'Sin asignar';
 const espOpts=(sel,blank='— Sin asignar —')=>opts(L('espacios').sort((a,b)=>ncmp(a.nombre,b.nombre)).map(e=>[e.id,e.nombre]),sel,blank);
 const respOpts=(sel,blank='— Sin asignar —')=>opts(RESPS().map(r=>[r.id,r.nombre]),sel,blank);
+async function genSeries(n){const st=await DB.reserve('counters/serie',n),y=new Date().getFullYear(),p=(cfg().serPrefijo||'SG21').replace(/[^A-Za-z0-9]/g,'').toUpperCase()||'SG21';return Array.from({length:n},(_,i)=>`${p}-${y}-${String(st+i).padStart(5,'0')}`)}
 const mkCode=n=>`${(cfg().prefijo||'BM').replace(/[^A-Za-z0-9]/g,'').toUpperCase()||'BM'}-${String(n).padStart(4,'0')}`;
 const pendNec=()=>NECS().filter(n=>n.estado!=='Atendida').length;
 
@@ -483,6 +488,7 @@ function vInicio(){
    <div class="kpi a" data-go="bienes" data-sit="En reparación"><div class="v">${c('En reparación')}</div><div class="l">En reparación</div></div>
    <div class="kpi r" data-go="bienes" data-sit="Dañado"><div class="v">${c('Dañado')}</div><div class="l">Dañados</div></div>
    <div class="kpi p" data-go="bienes" data-sit="Faltante"><div class="v">${c('Faltante')}</div><div class="l">Faltantes</div></div>
+   <div class="kpi" data-go="bienes" data-sit="Baja"><div class="v" style="color:var(--n)">${BIENES().filter(b=>b.situacion==='Baja').length}</div><div class="l">Bajas registradas</div></div>
    <div class="kpi r" data-go="bienes" data-est="Malo"><div class="v">${malos}</div><div class="l">En mal estado</div></div>
    <div class="kpi" data-go="espacios"><div class="v">${E.length}</div><div class="l">Espacios</div></div>
    <div class="kpi" data-go="materiales"><div class="v">${M.length}</div><div class="l">Materiales</div></div>
@@ -495,7 +501,7 @@ function vInicio(){
    <div class="card bars"><b>Bienes por espacio</b><div style="margin-top:8px">${bars(topE,mx,k=>k?espName(k):'Sin espacio')}</div></div>
    <div class="card bars"><b>Bienes por categoría</b><div style="margin-top:8px">${bars(topC,mc,k=>k)}</div></div>
   </div>`;
-  $$('.kpi').forEach(k=>k.onclick=()=>{Object.assign(BF,{q:'',esp:'',resp:'',sit:k.dataset.sit||'',cat:'',est:k.dataset.est||''});go(k.dataset.go)});
+  $$('.kpi').forEach(k=>k.onclick=()=>{Object.assign(BF,{q:'',esp:'',resp:'',sit:k.dataset.sit||'__act',cat:'',est:k.dataset.est||''});go(k.dataset.go)});
  };
  draw();VIEWS.inicio.refresh=draw;
 }
@@ -503,9 +509,9 @@ function vInicio(){
 /* =====================================================================
    VISTA: BIENES
    ===================================================================== */
-const BF={q:'',esp:'',resp:'',sit:'',cat:'',est:''};
+const BF={q:'',esp:'',resp:'',sit:'__act',cat:'',est:''};
 const SEL=new Set();let BLIM=150;
-function filtB(){const q=norm(BF.q);return BIENES().filter(b=>(!BF.esp||(BF.esp==='__none'?!b.espacioId:b.espacioId===BF.esp))&&(!BF.resp||b.responsableId===BF.resp)&&(!BF.sit||b.situacion===BF.sit)&&(!BF.cat||b.categoria===BF.cat)&&(!BF.est||b.estado===BF.est)&&(!q||norm([b.codigo,b.descripcion,b.marca,b.modelo,b.serie,b.inventario,espName(b.espacioId),respName(b.responsableId),b.observaciones].join(' ')).includes(q)))}
+function filtB(){const q=norm(BF.q);return BIENES().filter(b=>(!BF.esp||(BF.esp==='__none'?!b.espacioId:b.espacioId===BF.esp))&&(!BF.resp||b.responsableId===BF.resp)&&(BF.sit==='__act'?b.situacion!=='Baja':(!BF.sit||b.situacion===BF.sit))&&(!BF.cat||b.categoria===BF.cat)&&(!BF.est||b.estado===BF.est)&&(!q||norm([b.codigo,b.descripcion,b.marca,b.modelo,b.serie,b.inventario,espName(b.espacioId),respName(b.responsableId),b.observaciones].join(' ')).includes(q)))}
 function vBienes(){
  const c=cfg();BLIM=150;
  $('#view').innerHTML=`
@@ -513,7 +519,7 @@ function vBienes(){
   <div class="grow">${ic('search',16)}<input id="bq" placeholder="Buscar por código, descripción, marca, serie…" value="${esc(BF.q)}"></div>
   <select id="fEsp"><option value="">Todos los espacios</option><option value="__none"${BF.esp==='__none'?' selected':''}>Sin espacio</option>${espOpts(BF.esp,undefined).replace(/^<option value="">.*?<\/option>/,'')}</select>
   ${seeAll()?`<select id="fResp">${respOpts(BF.resp,'Todos los responsables')}</select>`:''}
-  <select id="fSit">${opts(SITUACIONES,BF.sit,'Toda situación')}</select>
+  <select id="fSit">${opts([['__act','Activos (sin bajas)'],['','Todos (incluye bajas)'],...SITUACIONES.map(x=>[x,x==='Baja'?'Bajas':x])],BF.sit)}</select>
   <select id="fEst">${opts(ESTADOS,BF.est,'Todo estado')}</select>
   <select id="fCat">${opts(c.categorias,BF.cat,'Toda categoría')}</select>
  </div>
@@ -534,9 +540,9 @@ function vBienes(){
   [...SEL].forEach(k=>{if(!S.bienes[k])SEL.delete(k)});
   $('#selbar').innerHTML=SEL.size?`<div class="selbar"><b>${SEL.size} seleccionado${SEL.size===1?'':'s'}</b>
    ${canEdit()?`<button class="btn sm" id="sPrint">${ic('qr',15)} Imprimir etiquetas</button>`:''}
-   ${isAdmin()?`<button class="btn sm" id="sMove">${ic('pin',15)} Cambiar espacio / resguardo</button><button class="btn sm" id="sState">${ic('edit',15)} Cambiar estado</button>`:''}
+   ${isAdmin()?`<button class="btn sm" id="sMove">${ic('pin',15)} Cambiar espacio / resguardo</button><button class="btn sm" id="sState">${ic('edit',15)} Cambiar estado</button><button class="btn sm dan" id="sBaja">${ic('trash',15)} Dar de baja</button>`:''}
    <button class="btn sm" id="sClr">Quitar selección</button></div>`:'';
-  if(SEL.size){$('#sClr').onclick=()=>{SEL.clear();list()};if($('#sPrint'))$('#sPrint').onclick=()=>{ET.src='sel';go('etiquetas')};if($('#sMove'))$('#sMove').onclick=()=>massMove();if($('#sState'))$('#sState').onclick=()=>massState()}
+  if(SEL.size){$('#sClr').onclick=()=>{SEL.clear();list()};if($('#sPrint'))$('#sPrint').onclick=()=>{ET.src='sel';go('etiquetas')};if($('#sMove'))$('#sMove').onclick=()=>massMove();if($('#sState'))$('#sState').onclick=()=>massState();if($('#sBaja'))$('#sBaja').onclick=()=>darBaja([...SEL].filter(k=>S.bienes[k]?.situacion!=='Baja'))}
   if(!R.length){$('#bList').innerHTML=`<div class="card empty">${ic('box',42)}<div>${BIENES().length?'Ningún bien coincide con los filtros.':'Aún no hay bienes registrados.'}</div>${isAdmin()&&!BIENES().length?`<p><button class="btn pri" onclick="bienForm()">${ic('plus')} Registrar el primero</button></p>`:''}</div>`;return}
   const V=R.slice(0,BLIM),all=R.every(b=>SEL.has(b.codigo));
   $('#bList').innerHTML=`<div class="tw"><table class="rt"><thead><tr><th style="width:34px"><input type="checkbox" id="ckAll" ${all?'checked':''} title="Seleccionar todos los filtrados"></th><th>Código</th><th>Descripción</th><th>Categoría</th><th>Espacio</th><th>Responsable</th><th>Estado</th><th>Situación</th><th>Verificado</th></tr></thead><tbody>
@@ -561,13 +567,13 @@ function bienForm(code){
   <label>Fecha de alta<input type="date" name="fechaAlta" value="${esc(b.fechaAlta)}"></label>
   <label>Marca<input name="marca" value="${esc(b.marca)}"></label>
   <label>Modelo<input name="modelo" value="${esc(b.modelo)}"></label>
-  <label>No. de serie<input name="serie" value="${esc(b.serie)}"></label>
+  <label>No. de serie<span style="display:flex;gap:6px"><input name="serie" value="${esc(b.serie)}" placeholder="Del fabricante o generado"><button type="button" class="btn sm" id="genSer" title="Generar un número de serie interno">Generar</button></span>${code?'':'<span style="display:flex;gap:6px;align-items:center;font-weight:400"><input type="checkbox" name="__autoser" style="width:auto"> Generar uno distinto para cada pieza</span>'}</label>
   <label>No. de inventario oficial<input name="inventario" value="${esc(b.inventario)}" placeholder="Si tiene número de la SEP/IEEPO"></label>
   <label>Espacio / ubicación<select name="espacioId">${espOpts(b.espacioId)}</select></label>
   <label>Responsable (resguardo)<select name="responsableId">${respOpts(b.responsableId)}</select></label>
   <label>Estado físico<select name="estado">${opts(ESTADOS,b.estado)}</select></label>
   <label>¿Funciona?<select name="funciona">${opts(FUNCIONA,b.funciona)}</select></label>
-  <label>Situación<select name="situacion">${opts(SITUACIONES,b.situacion)}</select></label>
+  <label>Situación<select name="situacion">${opts(SITUACIONES.filter(x=>x!=='Baja'||b.situacion==='Baja'),b.situacion)}</select><small>Para dar de baja usa el botón "Dar de baja" en la ficha.</small></label>
   <label>Valor aproximado ($)<input type="number" step="0.01" min="0" name="valor" value="${esc(b.valor)}"></label>
   <label class="c2">Observaciones<textarea name="observaciones" rows="2">${esc(b.observaciones)}</textarea></label>
   <label class="c2">Fotografía (opcional)<input type="file" accept="image/*" capture="environment" name="__foto"><small>${code?'Si subes una nueva, reemplaza la anterior.':'Solo se guarda cuando das de alta una sola pieza.'}</small></label>
@@ -580,16 +586,20 @@ function bienForm(code){
    await logChanges(code,old,d);closeModal(m);toast('Cambios guardados','ok');
   }else{
    const n=Math.max(1,Math.min(300,parseInt($('[name=__cant]',f).value)||1));
+   const auto=$('[name=__autoser]',f)?.checked&&!d.serie,sers=auto?await genSeries(n):[];
    const st=await DB.reserve('counters/bien',n),codes=[],up={},t=Date.now();
-   for(let i=0;i<n;i++){const k=mkCode(st+i);codes.push(k);up['bienes/'+k]={...d,creado:t,creadoPor:ME.nombre};up[`movimientos/${k}/${uid()}`]={t,u:ME.nombre,tipo:'Alta',det:`Espacio: ${espName(d.espacioId)} · Resguardo: ${respName(d.responsableId)}`}}
+   for(let i=0;i<n;i++){const k=mkCode(st+i);codes.push(k);up['bienes/'+k]={...d,...(auto?{serie:sers[i]}:{}),creado:t,creadoPor:ME.nombre};up[`movimientos/${k}/${uid()}`]={t,u:ME.nombre,tipo:'Alta',det:`Espacio: ${espName(d.espacioId)} · Resguardo: ${respName(d.responsableId)}`}}
    if(foto&&n===1)up['fotos/'+codes[0]]=foto;
    await DB.multi(up);closeModal(m);
-   toast(n===1?`Registrado ${codes[0]}`:`Registrados ${n} bienes (${codes[0]} a ${codes.at(-1)})`,'ok');
+   if(foto&&n===1)toast(`Foto comprimida a ${kb(foto)} KB`);toast(n===1?`Registrado ${codes[0]}`:`Registrados ${n} bienes (${codes[0]} a ${codes.at(-1)})`,'ok');
    if(await confirmDlg(`¿Imprimir ${n===1?'la etiqueta QR':'las '+n+' etiquetas QR'} ahora?`,'Imprimir')){SEL.clear();codes.forEach(k=>SEL.add(k));ET.src='sel';go('etiquetas')}
   }
  }}]});
  const fe=$('[name=espacioId]',m),fr=$('[name=responsableId]',m);
  fe.onchange=()=>{const r=S.espacios[fe.value]?.responsableId;if(r)fr.value=r};
+ $('#genSer',m).onclick=async e=>{const inp=$('[name=serie]',m),cant=parseInt($('[name=__cant]',m)?.value)||1;
+  if(!code&&cant>1){const ck=$('[name=__autoser]',m);ck.checked=true;inp.value='';toast('Se generará un número de serie distinto para cada pieza al guardar');return}
+  if(inp.value&&!await confirmDlg('¿Reemplazar el número de serie actual?','Reemplazar'))return;e.target.disabled=true;try{inp.value=(await genSeries(1))[0]}finally{e.target.disabled=false}};
 }
 
 async function logChanges(code,o,d,extra=''){
@@ -611,10 +621,12 @@ async function ficha(code){
  const acts=[];
  if(canEdit())acts.push({label:ic('qr')+' Etiqueta',fn:()=>printLabels([code],c.etiqTam)});
  if(can)acts.push({label:ic('check')+' Verificar',fn:async(m)=>{await verificar(code);closeModal(m);ficha(code)}});
- if(isAdmin())acts.push({label:ic('trash')+' Eliminar',cls:'dan',fn:async(m)=>{if(await confirmDlg(`¿Eliminar definitivamente <b>${esc(code)}</b>? Si el bien se dio de baja, mejor cambia su situación a "Baja" para conservar el historial.`,'Eliminar','dan')){await DB.multi({['bienes/'+code]:null,['fotos/'+code]:null,['movimientos/'+code]:null});SEL.delete(code);closeModal(m);toast('Bien eliminado')}}});
+ if(isAdmin()&&b.situacion!=='Baja')acts.push({label:ic('trash')+' Dar de baja',cls:'dan',fn:(m)=>{closeModal(m);darBaja([code])}});
+ if(isAdmin()&&b.situacion==='Baja')acts.push({label:ic('print')+' Acta de baja',fn:()=>informeBajas([code])},{label:'Reactivar',fn:async(m)=>{if(await confirmDlg(`¿Reactivar <b>${esc(code)}</b> y quitarle la baja?`,'Reactivar')){await DB.update('bienes/'+code,{situacion:'En uso',baja:null});await DB.push('movimientos/'+code,{t:Date.now(),u:ME.nombre,tipo:'Reactivación',det:'Se canceló la baja'});closeModal(m);ficha(code)}}});
+ if(isAdmin())acts.push({label:ic('x')+' Eliminar',cls:'dan',fn:async(m)=>{if(await confirmDlg(`¿Eliminar definitivamente <b>${esc(code)}</b>? Si el bien se dio de baja, mejor cambia su situación a "Baja" para conservar el historial.`,'Eliminar','dan')){await DB.multi({['bienes/'+code]:null,['fotos/'+code]:null,['movimientos/'+code]:null});SEL.delete(code);closeModal(m);toast('Bien eliminado')}}});
  if(isAdmin())acts.push({label:ic('edit')+' Editar',cls:'pri',fn:(m)=>{closeModal(m);bienForm(code)}});
  else if(can)acts.push({label:ic('edit')+' Actualizar estado',cls:'pri',fn:(m)=>{closeModal(m);quickState(code)}});
- const m=openModal({title:'Ficha del bien',wide:true,body:`<div class="ficha"><div class="fq">${qrSVG(qrContent(code))}<div class="fcode">${esc(code)}</div><div id="fFoto"></div></div>
+ const m=openModal({title:'Ficha del bien',wide:true,body:`<div class="ficha"><div class="fq">${qrSVG(qrContent(code))}<div class="fcode">${esc(code)}</div><div id="fFoto"></div>${can?`<div style="display:flex;gap:6px;justify-content:center;margin-top:8px;flex-wrap:wrap"><label class="btn sm" style="flex-direction:row;font-weight:400">${ic('camera',15)} <span id="fFotoLbl">Tomar foto</span><input type="file" accept="image/*" capture="environment" id="fFotoIn" hidden></label><button class="btn sm" id="fFotoDel" hidden>Quitar</button></div>`:''}</div>
   <div class="fd"><h2>${esc(b.descripcion)}</h2><div class="pills">${pill(b.estado,PE)} ${pill(b.situacion,PS)} ${b.funciona?pill('Funciona: '+b.funciona,{'Funciona: Sí':'g','Funciona: No':'r'}):''}</div>
   <dl><dt>Espacio</dt><dd>${esc(espName(b.espacioId))}${S.espacios[b.espacioId]?.ubicacion?` <span class="muted">· ${esc(S.espacios[b.espacioId].ubicacion)}</span>`:''}</dd>
   <dt>Responsable</dt><dd>${esc(respName(b.responsableId))}</dd>
@@ -625,9 +637,13 @@ async function ficha(code){
   <dt>Fecha de alta</dt><dd>${b.fechaAlta?esc(b.fechaAlta.split('-').reverse().join('/')):'—'}</dd>
   ${b.valor!==''&&b.valor!=null?`<dt>Valor aprox.</dt><dd>$${Number(b.valor).toLocaleString('es-MX',{minimumFractionDigits:2})}</dd>`:''}
   <dt>Última verificación</dt><dd>${b.ultimaVerif?fdt(b.ultimaVerif)+' · '+esc(b.verifPor||''):'Nunca'}</dd>
-  ${b.observaciones?`<dt>Observaciones</dt><dd>${esc(b.observaciones)}</dd>`:''}</dl></div></div>
+  ${b.observaciones?`<dt>Observaciones</dt><dd>${esc(b.observaciones)}</dd>`:''}
+  ${b.situacion==='Baja'&&b.baja?`<dt style="color:var(--r)">Baja</dt><dd>${esc(b.baja.fecha?b.baja.fecha.split('-').reverse().join('/'):'')} · ${esc(b.baja.motivo||'')}${b.baja.desc?`<br><span class="muted">${esc(b.baja.desc)}</span>`:''}${b.baja.autorizo?`<br><span class="muted">Autorizó: ${esc(b.baja.autorizo)}</span>`:''}</dd>`:''}</dl></div></div>
   <h3 class="sec">${ic('file',16)} Historial de movimientos</h3><div class="hist" id="fHist"><span class="muted">Cargando…</span></div>`,actions:[...acts,{label:'Cerrar',close:true}]});
- DB.get('fotos/'+code).then(f=>{if(f&&$('#fFoto',m))$('#fFoto',m).innerHTML=`<img src="${f}" alt="Foto">`}).catch(()=>{});
+ const showFoto=f=>{const el=$('#fFoto',m);if(!el)return;el.innerHTML=f?`<img src="${f}" alt="Foto"><div class="muted" style="font-size:11.5px">${kb(f)} KB</div>`:'';if($('#fFotoLbl',m))$('#fFotoLbl',m).textContent=f?'Cambiar foto':'Tomar foto';if($('#fFotoDel',m))$('#fFotoDel',m).hidden=!f};
+ DB.get('fotos/'+code).then(showFoto).catch(()=>{});
+ if($('#fFotoIn',m))$('#fFotoIn',m).onchange=async e=>{const fl=e.target.files[0];e.target.value='';if(!fl)return;try{toast('Comprimiendo foto…');const f=await compressImg(fl);await DB.set('fotos/'+code,f);await DB.push('movimientos/'+code,{t:Date.now(),u:ME.nombre,tipo:'Fotografía',det:'Se actualizó la foto'});showFoto(f);toast(`Foto guardada (${kb(f)} KB)`,'ok')}catch(err){toast(err.message,'err')}};
+ if($('#fFotoDel',m))$('#fFotoDel',m).onclick=async()=>{if(await confirmDlg('¿Quitar la foto de este bien?','Quitar','dan')){await DB.remove('fotos/'+code);showFoto(null)}};
  DB.get('movimientos/'+code).then(h=>{const el=$('#fHist',m);if(!el)return;const a=Object.values(h||{}).sort((x,y)=>y.t-x.t);el.innerHTML=a.length?a.map(x=>`<div><time>${fdt(x.t)}</time><span><b>${esc(x.tipo)}</b> — ${esc(x.det||'')} <span class="muted">(${esc(x.u||'')})</span></span></div>`).join(''):'<span class="muted">Sin movimientos registrados.</span>'}).catch(()=>{});
 }
 
@@ -638,6 +654,20 @@ async function verificar(code,extra){
  return true;
 }
 
+function darBaja(codes){
+ if(!codes.length)return toast('No hay bienes activos seleccionados','err');const c=cfg(),n=codes.length;
+ const m=openModal({title:n===1?`Dar de baja ${codes[0]}`:`Dar de baja ${n} bienes`,body:`<div class="muted" style="margin:-4px 0 12px;font-size:13.5px">${n===1?esc(S.bienes[codes[0]]?.descripcion||''):esc(codes.slice(0,6).join(', '))+(n>6?'…':'')}. El bien queda en el historial con situación <b>Baja</b>; ya no cuenta en el inventario activo.</div>
+ <form class="fg" id="fbj" onsubmit="return false">
+  <label class="c2">Motivo *<select name="motivo" required>${opts(MOTIVOS_BAJA,'Dañado sin posibilidad de reparación')}</select></label>
+  <label>Fecha de baja<input type="date" name="fecha" value="${today()}"></label>
+  <label>Autorizó<input name="autorizo" value="${esc(c.recibeNombre)}"></label>
+  <label class="c2">Descripción del daño / dictamen<textarea name="desc" rows="3" placeholder="Ej. Estructura metálica fracturada, asiento roto; no es reparable."></textarea></label></form>`,
+ actions:[CANCEL,{label:ic('trash')+' Registrar baja',cls:'pri',fn:async(m)=>{const f=$('#fbj',m);if(!f.reportValidity())return;const d=readForm(f),t=Date.now(),up={};
+  codes.forEach(k=>{const o=S.bienes[k];if(!o)return;up[`bienes/${k}/situacion`]='Baja';up[`bienes/${k}/baja`]={...d,por:ME.nombre,t,situacionAnterior:o.situacion||'',estadoAnterior:o.estado||''};if(['Dañado sin posibilidad de reparación','Ya no funciona'].includes(d.motivo)){up[`bienes/${k}/funciona`]='No';up[`bienes/${k}/estado`]='Malo'}
+   up[`movimientos/${k}/${uid()}`]={t,u:ME.nombre,tipo:'Baja',det:`${d.motivo}${d.desc?' · '+d.desc:''}`}});
+  await DB.multi(up);closeModal(m);codes.forEach(k=>SEL.delete(k));toast(`${n===1?'Baja registrada':n+' bajas registradas'}`,'ok');
+  if(await confirmDlg('¿Imprimir el acta / reporte de esta baja?','Imprimir'))informeBajas(codes)}}]});
+}
 function quickState(code){
  const b=S.bienes[code];
  const m=openModal({title:'Actualizar estado · '+code,body:`<form class="fg" id="fq" onsubmit="return false">
@@ -666,7 +696,7 @@ function massState(){
  const m=openModal({title:`Cambiar estado (${n})`,body:`<form class="fg" id="fs" onsubmit="return false">
   <label>Estado físico<select name="estado"><option value="__keep">— No cambiar —</option>${opts(ESTADOS)}</select></label>
   <label>¿Funciona?<select name="funciona"><option value="__keep">— No cambiar —</option>${opts(FUNCIONA)}</select></label>
-  <label class="c2">Situación<select name="situacion"><option value="__keep">— No cambiar —</option>${opts(SITUACIONES)}</select></label></form>`,
+  <label class="c2">Situación<select name="situacion"><option value="__keep">— No cambiar —</option>${opts(SITUACIONES.filter(x=>x!=='Baja'))}</select></label></form>`,
   actions:[CANCEL,{label:'Aplicar',cls:'pri',fn:async(m)=>{const d=readForm($('#fs',m));const up={},t=Date.now();
    for(const k of SEL){const o=S.bienes[k];if(!o)continue;const ch=[];['estado','funciona','situacion'].forEach(f=>{if(d[f]!=='__keep'&&o[f]!==d[f]){up[`bienes/${k}/${f}`]=d[f];ch.push(`${f}: ${o[f]||'—'} → ${d[f]}`)}});if(ch.length)up[`movimientos/${k}/${uid()}`]={t,u:ME.nombre,tipo:'Cambio de estado',det:ch.join(' · ')}}
    await DB.multi(up);closeModal(m);toast('Estados actualizados','ok')}}]});
@@ -692,7 +722,7 @@ function vEspacios(){
    <div class="stats"><span class="pill n">${nb.length} bienes</span><span class="pill n">${M.filter(x=>x.espacioId===e.id).length} materiales</span>${np?`<span class="pill r">${np} con problema</span>`:''}${cm?`<span class="pill r">${cm} elem. en mal estado</span>`:''}${cr?`<span class="pill a">${cr} regular</span>`:''}${nn?`<span class="pill a">${nn} necesidades</span>`:''}</div>
    <div class="acts"><button class="btn sm" data-a="bienes" data-id="${e.id}">${ic('box',15)} Bienes</button>${can?`<button class="btn sm" data-a="edit" data-id="${e.id}">${ic('edit',15)} ${isAdmin()?'Editar':'Condiciones'}</button>`:`<button class="btn sm" data-a="ver" data-id="${e.id}">Ver condiciones</button>`}${canEdit()?`<button class="btn sm" data-a="nec" data-id="${e.id}">${ic('alert',15)} Necesidad</button>`:''}</div></div>`}).join('')}</div>`
   :`<div class="card empty">${ic('pin',42)}<div>${ESPACIOS().length?'Sin resultados.':(seeAll()?'Registra los espacios de la escuela: aulas, laboratorios, oficinas, bodegas…':'No tienes espacios asignados.')}</div></div>`;
-  $$('#eList [data-a]').forEach(b=>b.onclick=()=>{const id=b.dataset.id;({bienes:()=>{Object.assign(BF,{q:'',esp:id,resp:'',sit:'',cat:'',est:''});go('bienes')},edit:()=>espForm(id),ver:()=>espForm(id,true),nec:()=>necForm(null,id)})[b.dataset.a]()});
+  $$('#eList [data-a]').forEach(b=>b.onclick=()=>{const id=b.dataset.id;({bienes:()=>{Object.assign(BF,{q:'',esp:id,resp:'',sit:'__act',cat:'',est:''});go('bienes')},edit:()=>espForm(id),ver:()=>espForm(id,true),nec:()=>necForm(null,id)})[b.dataset.a]()});
  };
  list();VIEWS.espacios.refresh=list;
 }
@@ -917,13 +947,15 @@ function vInformes(){
   ${all?`<label>Responsable<select id="iResp">${respOpts('','— Elegir —')}</select></label>`:''}<div class="acts"><button class="btn pri" id="iR">${ic('print')} Generar e imprimir</button></div></div>
  <div class="ec"><h4>${ic('pin')} Inventario por espacio</h4><div class="meta">Lista de bienes y materiales de un espacio, con condiciones físicas.</div>
   <label>Espacio<select id="iEsp">${opts(ESPACIOS().map(e=>[e.id,e.nombre]),'','— Todos —')}</select></label><div class="acts"><button class="btn pri" id="iE">${ic('print')} Imprimir</button></div></div>
+ <div class="ec"><h4>${ic('trash')} Reporte de bajas</h4><div class="meta">Bienes dañados o que ya no funcionan dados de baja, con motivo, dictamen y firmas.</div>
+  <div class="fg"><label>Desde<input type="date" id="bjD"></label><label>Hasta<input type="date" id="bjH"></label></div><div class="acts"><button class="btn pri" id="iB">${ic('print')} Imprimir</button></div></div>
  <div class="ec"><h4>${ic('alert')} Bienes con problema</h4><div class="meta">Faltantes, dañados, en reparación, en mal estado o que no funcionan.</div><div class="acts"><button class="btn pri" id="iP">${ic('print')} Imprimir</button></div></div>
  <div class="ec"><h4>${ic('alert')} Necesidades pendientes</h4><div class="meta">Mantenimiento, reparación, adecuación y adquisiciones por atender, ordenadas por prioridad.</div><div class="acts"><button class="btn pri" id="iN">${ic('print')} Imprimir</button></div></div>
- <div class="ec"><h4>${ic('download')} Exportar a Excel</h4><div class="meta">Archivos CSV que abren directamente en Excel.</div><div class="acts"><button class="btn" id="xB">Bienes</button><button class="btn" id="xM">Materiales</button><button class="btn" id="xN">Necesidades</button></div></div>
+ <div class="ec"><h4>${ic('download')} Exportar a Excel</h4><div class="meta">Archivos CSV que abren directamente en Excel.</div><div class="acts"><button class="btn" id="xB">Bienes</button><button class="btn" id="xM">Materiales</button><button class="btn" id="xN">Necesidades</button><button class="btn" id="xJ">Bajas</button></div></div>
  </div>`;
  $('#iR').onclick=()=>{const id=all?$('#iResp').value:ME.responsableId;if(!id)return toast(all?'Elige un responsable':'Tu usuario no está vinculado a un responsable. Pídelo al administrador.','err');informeResp(id)};
  $('#iE').onclick=()=>informeEsp($('#iEsp').value);
- $('#iP').onclick=informeProblemas;$('#iN').onclick=informeNec;
+ $('#iP').onclick=informeProblemas;$('#iB').onclick=()=>informeBajas(null,$('#bjD').value,$('#bjH').value);$('#xJ').onclick=()=>csvBajas(BIENES().filter(b=>b.situacion==='Baja'));$('#iN').onclick=informeNec;
  $('#xB').onclick=()=>csvBienes(BIENES());$('#xM').onclick=()=>csvMats(MATS());$('#xN').onclick=()=>csvNec(NECS());
  VIEWS.informes.refresh=()=>{};
 }
@@ -931,7 +963,7 @@ function repHead(title){const c=cfg();return`<h1>${esc(c.escuela.toUpperCase())}
 function grpBienes(B){const g={};B.forEach(b=>{const k=[b.descripcion,b.marca,b.modelo,b.espacioId,b.estado,b.funciona,b.situacion].join('|');(g[k]??={...b,codes:[]}).codes.push(b.codigo)});return Object.values(g).map(x=>({...x,codes:x.codes.sort(ncmp)}))}
 const codesTxt=c=>c.length<=3?c.join(', '):`${c[0]} … ${c.at(-1)} (${c.length})`;
 function bienesTable(B,showEsp=true){const G=grpBienes(B);return G.length?`<table><tr><th>No.</th><th>Descripción del bien</th><th>Marca / modelo / serie</th>${showEsp?'<th>Espacio</th>':''}<th>Cant.</th><th>Estado físico</th><th>¿Funciona?</th><th>Situación</th><th>Código(s) QR</th></tr>${G.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.descripcion)}${x.observaciones?`<br><i style="font-size:8pt">${esc(x.observaciones)}</i>`:''}</td><td>${esc([x.marca,x.modelo,x.codes.length===1?x.serie:''].filter(Boolean).join(' / '))}${x.inventario&&x.codes.length===1?`<br>Inv. ${esc(x.inventario)}`:''}</td>${showEsp?`<td>${esc(espName(x.espacioId))}</td>`:''}<td style="text-align:center">${x.codes.length}</td><td>${esc(x.estado||'')}</td><td>${esc(x.funciona||'')}</td><td>${esc(x.situacion||'')}</td><td style="font-size:8pt">${esc(codesTxt(x.codes))}</td></tr>`).join('')}</table>`:'<p><i>Sin bienes registrados.</i></p>'}
-const isProb=b=>['Faltante','Dañado','En reparación'].includes(b.situacion)||b.estado==='Malo'||b.funciona==='No';
+const isProb=b=>b.situacion!=='Baja'&&(['Faltante','Dañado','En reparación'].includes(b.situacion)||b.estado==='Malo'||b.funciona==='No');
 function matsTable(M,showEsp=true){return M.length?`<table><tr><th>No.</th><th>Material</th><th>Cantidad</th><th>Unidad</th><th>Exacta / aprox.</th><th>Estado</th>${showEsp?'<th>Espacio</th>':''}<th>Observaciones</th></tr>${M.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.nombre)}</td><td style="text-align:center">${esc(x.cantidad??'')}</td><td>${esc(x.unidad||'')}</td><td>${esc(x.precision||'Exacta')}</td><td>${esc(x.estado||'')}</td>${showEsp?`<td>${esc(espName(x.espacioId))}</td>`:''}<td>${esc(x.observaciones||'')}</td></tr>`).join('')}</table>`:'<p><i>Sin materiales registrados.</i></p>'}
 function condTable(e){const c=e.condiciones||{},k=Object.keys(c);return k.length?`<table><tr><th>Elemento</th><th style="width:60px">Estado</th><th>Descripción</th></tr>${k.map(x=>`<tr><td>${esc(x)}</td><td style="text-align:center">${{B:'Bueno',R:'Regular',M:'Malo'}[c[x].e]||'—'}</td><td>${esc(c[x].d||'')}</td></tr>`).join('')}</table>`:'<p><i>Condiciones no registradas.</i></p>'}
 function necTable(N){return N.length?`<table><tr><th>No.</th><th>Necesidad detectada</th><th>Tipo</th><th>Prioridad</th><th>Estado</th></tr>${N.map((n,i)=>`<tr><td>${i+1}</td><td>${esc(n.descripcion)}${n.bienCodigo?` (${esc(n.bienCodigo)})`:''}</td><td>${esc(n.tipo)}</td><td>${esc(n.prioridad)}</td><td>${esc(n.estado)}</td></tr>`).join('')}</table>`:'<p><i>Sin necesidades registradas.</i></p>'}
@@ -959,6 +991,18 @@ function informeEsp(id){
  const E=id?[S.espacios[id]&&{...S.espacios[id],id}].filter(Boolean):ESPACIOS();const B=BIENES().filter(b=>b.situacion!=='Baja'),M=MATS();
  printHTML(repHead('INVENTARIO POR ESPACIO')+`<p style="text-align:right">Fecha: ${fdLong()}</p>`+E.map(e=>`<h3>${esc(e.nombre)}</h3><p><b>Ubicación:</b> ${esc([e.tipo,e.ubicacion].filter(Boolean).join(', ')||'—')} · <b>Responsable:</b> ${esc(respName(e.responsableId))}</p><h4>Condiciones físicas</h4>${condTable(e)}<h4>Bienes</h4>${bienesTable(B.filter(b=>b.espacioId===e.id),false)}<h4>Materiales</h4>${matsTable(M.filter(x=>x.espacioId===e.id),false)}`).join('')+(id?'':`<h3>Bienes sin espacio asignado</h3>${bienesTable(B.filter(b=>!b.espacioId||!S.espacios[b.espacioId]),false)}`),'rep');
 }
+function informeBajas(codes,desde,hasta){
+ const c=cfg();let B=BIENES().filter(b=>b.situacion==='Baja');
+ if(codes)B=B.filter(b=>codes.includes(b.codigo));
+ if(desde)B=B.filter(b=>(b.baja?.fecha||'')>=desde);if(hasta)B=B.filter(b=>(b.baja?.fecha||'')<=hasta);
+ B.sort((a,b)=>ncmp(a.baja?.fecha,b.baja?.fecha)||ncmp(a.codigo,b.codigo));
+ const tot=B.reduce((s,b)=>s+(Number(b.valor)||0),0),fd=x=>x?x.split('-').reverse().join('/'):'';
+ const per=desde||hasta?`Periodo: ${desde?fd(desde):'inicio'} al ${hasta?fd(hasta):'a la fecha'}`:'';
+ printHTML(repHead(codes&&codes.length===1?'ACTA DE BAJA DE BIEN MUEBLE':'REPORTE DE BAJAS DE BIENES MUEBLES')+`<p style="text-align:right">${per?per+' · ':''}Fecha de emisión: ${fdLong()} · Total: ${B.length} bien${B.length===1?'':'es'}${tot?` · Valor aprox.: $${tot.toLocaleString('es-MX',{minimumFractionDigits:2})}`:''}</p>
+ <p style="text-align:justify">Se hace constar que los bienes muebles que se enlistan a continuación se dan de baja del inventario de la institución por encontrarse dañados, sin funcionar o por el motivo que se indica en cada caso.</p>`+
+ (B.length?`<table><tr><th>No.</th><th>Código</th><th>Descripción del bien</th><th>Marca / modelo / serie</th><th>Espacio</th><th>Resguardo</th><th>Fecha de baja</th><th>Motivo</th><th>Descripción del daño / dictamen</th></tr>${B.map((b,i)=>`<tr><td>${i+1}</td><td style="white-space:nowrap">${esc(b.codigo)}</td><td>${esc(b.descripcion)}</td><td>${esc([b.marca,b.modelo,b.serie].filter(Boolean).join(' / '))}${b.inventario?`<br>Inv. ${esc(b.inventario)}`:''}</td><td>${esc(espName(b.espacioId))}</td><td>${esc(respName(b.responsableId))}</td><td>${esc(fd(b.baja?.fecha))}</td><td>${esc(b.baja?.motivo||'')}</td><td>${esc(b.baja?.desc||b.observaciones||'')}</td></tr>`).join('')}</table>`:'<p><i>No hay bajas registradas en este periodo.</i></p>')+
+ `<div class="firmas"><div><b>ELABORÓ</b><br>${esc(c.contraloria||ME.nombre)}<br>Contraloría escolar</div><div><b>AUTORIZÓ</b><br>${esc(c.recibeNombre)}<br>${esc(c.recibeCargo)}</div><div><b>Vo. Bo.</b><br>${esc(c.voboNombre)}<br>${esc(c.voboCargo)}</div></div>`,'rep');
+}
 function informeProblemas(){const P=BIENES().filter(b=>b.situacion!=='Baja'&&isProb(b));
  printHTML(repHead('REPORTE DE BIENES FALTANTES, DAÑADOS O QUE REQUIEREN REPARACIÓN')+`<p style="text-align:right">Fecha: ${fdLong()} · Total: ${P.length}</p>`+(P.length?`<table><tr><th>No.</th><th>Código</th><th>Bien</th><th>Espacio</th><th>Responsable</th><th>Situación</th><th>Estado</th><th>Observaciones</th></tr>${P.map((b,i)=>`<tr><td>${i+1}</td><td>${esc(b.codigo)}</td><td>${esc(b.descripcion)}</td><td>${esc(espName(b.espacioId))}</td><td>${esc(respName(b.responsableId))}</td><td>${esc(b.situacion)}</td><td>${esc(b.estado)}${b.funciona==='No'?' / no funciona':''}</td><td>${esc(b.observaciones||'')}</td></tr>`).join('')}</table>`:'<p>No hay bienes con problema.</p>'),'rep')}
 function informeNec(){const N=NECS().filter(n=>n.estado!=='Atendida');
@@ -969,6 +1013,7 @@ const csvRow=a=>a.map(v=>{v=String(v??'');return/[",\n;]/.test(v)?`"${v.replace(
 const csvOut=(name,h,rows)=>dl(name,'﻿'+[csvRow(h),...rows.map(csvRow)].join('\r\n'),'text/csv;charset=utf-8');
 function csvBienes(B){csvOut(`bienes_${today()}.csv`,['Código','Descripción','Categoría','Marca','Modelo','No. serie','Inventario oficial','Espacio','Ubicación','Responsable','Estado físico','Funciona','Situación','Fecha de alta','Valor','Última verificación','Observaciones'],B.map(b=>[b.codigo,b.descripcion,b.categoria,b.marca,b.modelo,b.serie,b.inventario,espName(b.espacioId),S.espacios[b.espacioId]?.ubicacion,respName(b.responsableId),b.estado,b.funciona,b.situacion,b.fechaAlta,b.valor,b.ultimaVerif?fdt(b.ultimaVerif):'',b.observaciones]))}
 function csvMats(M){csvOut(`materiales_${today()}.csv`,['Material','Cantidad','Unidad','Precisión','Estado','Espacio','Responsable','Observaciones'],M.map(x=>[x.nombre,x.cantidad,x.unidad,x.precision,x.estado,espName(x.espacioId),respName(x.responsableId),x.observaciones]))}
+function csvBajas(B){csvOut(`bajas_${today()}.csv`,['Código','Descripción','Marca','Modelo','No. serie','Espacio','Responsable','Fecha de baja','Motivo','Dictamen','Autorizó','Registró','Valor'],B.map(b=>[b.codigo,b.descripcion,b.marca,b.modelo,b.serie,espName(b.espacioId),respName(b.responsableId),b.baja?.fecha,b.baja?.motivo,b.baja?.desc,b.baja?.autorizo,b.baja?.por,b.valor]))}
 function csvNec(N){csvOut(`necesidades_${today()}.csv`,['Espacio','Descripción','Tipo','Prioridad','Estado','Seguimiento','Bien','Reportó','Fecha'],N.map(n=>[espName(n.espacioId),n.descripcion,n.tipo,n.prioridad,n.estado,n.atencion,n.bienCodigo,n.reporto,fdate(n.fecha)]))}
 
 /* =====================================================================
@@ -988,22 +1033,28 @@ function vConfig(){
   <label>Recibe (cargo)<input name="recibeCargo" value="${esc(c.recibeCargo)}"></label>
   <label>Vo. Bo. (nombre)<input name="voboNombre" value="${esc(c.voboNombre)}"></label>
   <label>Vo. Bo. (cargo)<input name="voboCargo" value="${esc(c.voboCargo)}"></label>
+  <label>Nombre de la contralora<input name="contraloria" value="${esc(c.contraloria)}" placeholder="Aparece como ELABORÓ en el reporte de bajas"></label>
+  <label>Prefijo del No. de serie generado<input name="serPrefijo" maxlength="6" value="${esc(c.serPrefijo)}"><small>Formato: ${esc(c.serPrefijo)}-${new Date().getFullYear()}-00001</small></label>
   <label>Prefijo de los códigos<input name="prefijo" maxlength="5" value="${esc(c.prefijo)}"><small>Ej. BM → BM-0001. Siguiente código: <b id="nextC">…</b></small></label>
   <label>Contenido del QR<select name="qrModo">${opts([['url','Enlace a la app (se abre con la cámara del celular)'],['codigo','Solo el código']],c.qrModo)}</select></label>
   <label class="c2">Dirección web de la app (para el enlace del QR)<input name="urlBase" value="${esc(c.urlBase)}" placeholder="https://usuario.github.io/inventario/"><small>Si cambias la app de dirección, actualiza este dato y reimprime las etiquetas.</small></label>
   <label class="c2">Categorías de bienes (una por renglón)<textarea name="__cats" rows="5">${esc(c.categorias.join('\n'))}</textarea></label>
- </form><div class="toolbar" style="margin:12px 0 0"><button class="btn pri" id="cSave">${ic('check')} Guardar configuración</button></div></div>
+ </form><div class="toolbar" style="margin:12px 0 0"><button class="btn pri" id="cSave">${ic('check')} Guardar configuración</button><button class="btn" id="cSer">Generar No. de serie a los bienes que no tienen</button></div></div>
 
  <div class="card" style="margin-top:14px"><h3 class="sec" style="margin-top:0">${ic('users',16)} Usuarios con acceso</h3><div id="uBox"></div></div>
 
- <div class="card" style="margin-top:14px"><h3 class="sec" style="margin-top:0">${ic('download',16)} Respaldo de la información</h3>
-  <p class="muted" style="margin-top:0">Descarga periódicamente un respaldo completo (incluye historial y fotos). También sirve para pasar los datos del modo local a la nube.</p>
-  <div class="toolbar"><button class="btn" id="bkOut">${ic('download')} Descargar respaldo (.json)</button><label class="btn" style="flex-direction:row;font-weight:400">${ic('upload')} Restaurar respaldo<input type="file" accept=".json,application/json" id="bkIn" hidden></label></div></div>
+ <div class="card" style="margin-top:14px"><h3 class="sec" style="margin-top:0">${ic('download',16)} Descargar la base de datos</h3>
+  <p class="muted" style="margin-top:0"><b>Excel:</b> un archivo con una hoja por tabla (bienes activos, bajas, espacios y sus condiciones, materiales, necesidades, responsables e historial), para consultar o entregar. <b>Respaldo (.json):</b> copia exacta de todo, incluidas las fotos; es la que sirve para restaurar la información si algo se pierde.</p>
+  <div class="toolbar"><button class="btn pri" id="xlsOut">${ic('download')} Descargar en Excel (.xlsx)</button><button class="btn" id="bkOut">${ic('download')} Descargar respaldo (.json)</button><label class="btn" style="flex-direction:row;font-weight:400">${ic('upload')} Restaurar respaldo<input type="file" accept=".json,application/json" id="bkIn" hidden></label></div></div>
 
  <div class="card" style="margin-top:14px"><h3 class="sec" style="margin-top:0">${ic('gear',16)} Conexión</h3>
   <p style="margin:0">${cloud?`<span class="pill g">Nube (Firebase)</span> Los datos se comparten en tiempo real entre todas las computadoras y celulares.`:`<span class="pill a">Modo local</span> Los datos se guardan solo en este navegador. Para usar la app desde varios equipos, pega la configuración de Firebase al inicio del archivo <b>index.html</b> (constante <code>FIREBASE_CONFIG</code>).`}</p></div>`;
  DB.get('counters/bien').then(n=>{const e=$('#nextC');if(e)e.textContent=mkCode((n||0)+1)});
  $('#cSave').onclick=async()=>{const f=$('#fc');const d=readForm(f);d.categorias=$('[name=__cats]',f).value.split('\n').map(s=>s.trim()).filter(Boolean);d.prefijo=(d.prefijo||'BM').replace(/[^A-Za-z0-9]/g,'').toUpperCase()||'BM';await DB.update('config',d);toast('Configuración guardada','ok');$('#brSchool').textContent=d.escCorto};
+ $('#xlsOut').onclick=async e=>{e.target.disabled=true;try{await excelDB()}catch(err){toast(err.message,'err')}finally{e.target.disabled=false}};
+ $('#cSer').onclick=async()=>{const sin=L('bienes','codigo').filter(b=>!b.serie).sort((a,b)=>ncmp(a.codigo,b.codigo));if(!sin.length)return toast('Todos los bienes ya tienen número de serie','ok');
+  if(!await confirmDlg(`Se generará un número de serie para <b>${sin.length}</b> bien${sin.length===1?'':'es'} que no lo tienen. ¿Continuar?`,'Generar'))return;
+  const sr=await genSeries(sin.length),up={};sin.forEach((b,i)=>up[`bienes/${b.codigo}/serie`]=sr[i]);await DB.multi(up);toast(`${sin.length} números de serie generados`,'ok')};
  $('#bkOut').onclick=async()=>{toast('Preparando respaldo…');const all=await DB.get('');const o={...all};delete o.usuarios;dl(`respaldo_inventario_${today()}.json`,JSON.stringify({app:'InventarioQR',v:1,fecha:new Date().toISOString(),datos:o}),'application/json')};
  $('#bkIn').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const j=JSON.parse(await f.text());const d=j.datos||j;const keys=['espacios','responsables','bienes','materiales','necesidades','config','counters','movimientos','fotos'].filter(k=>k in d);
   if(!keys.length)throw new Error('El archivo no parece un respaldo de esta app');
@@ -1018,6 +1069,25 @@ function vConfig(){
   $('#uAdd').onclick=()=>userForm();$$('#uBox tr[data-id] .icon-btn').forEach(b=>b.onclick=()=>userForm(b.closest('tr').dataset.id));
  };
  users();VIEWS.config.refresh=users;
+}
+async function excelDB(){
+ toast('Preparando el archivo de Excel…');await loadScript(XLSXJS,'XLSX');
+ const mov=await DB.get('movimientos')||{},fd=x=>x?String(x).split('-').reverse().join('/'):'';
+ const B=L('bienes','codigo').sort((a,b)=>ncmp(a.codigo,b.codigo));
+ const bien=b=>({'Código':b.codigo,'Descripción':b.descripcion||'','Categoría':b.categoria||'','Marca':b.marca||'','Modelo':b.modelo||'','No. de serie':b.serie||'','Inventario oficial':b.inventario||'','Espacio':espName(b.espacioId),'Ubicación':S.espacios[b.espacioId]?.ubicacion||'','Responsable':respName(b.responsableId),'Estado físico':b.estado||'','Funciona':b.funciona||'','Situación':b.situacion||'','Fecha de alta':fd(b.fechaAlta),'Valor':b.valor===''||b.valor==null?'':Number(b.valor),'Última verificación':b.ultimaVerif?fdt(b.ultimaVerif):'','Observaciones':b.observaciones||''});
+ const sh={
+  'Bienes activos':B.filter(b=>b.situacion!=='Baja').map(bien),
+  'Bajas':B.filter(b=>b.situacion==='Baja').map(b=>({...bien(b),'Fecha de baja':fd(b.baja?.fecha),'Motivo de baja':b.baja?.motivo||'','Dictamen':b.baja?.desc||'','Autorizó':b.baja?.autorizo||'','Registró':b.baja?.por||''})),
+  'Espacios':L('espacios').sort((a,b)=>ncmp(a.nombre,b.nombre)).map(e=>({'Espacio':e.nombre,'Tipo':e.tipo||'','Ubicación':e.ubicacion||'','Responsable':respName(e.responsableId),'Turno':e.turno||'','Bienes activos':B.filter(b=>b.espacioId===e.id&&b.situacion!=='Baja').length,'Observaciones':e.observaciones||''})),
+  'Condiciones':L('espacios').flatMap(e=>Object.entries(e.condiciones||{}).map(([k,v])=>({'Espacio':e.nombre,'Elemento':k,'Estado':{B:'Bueno',R:'Regular',M:'Malo'}[v.e]||'','Descripción':v.d||''}))),
+  'Materiales':L('materiales').sort((a,b)=>ncmp(a.nombre,b.nombre)).map(x=>({'Material':x.nombre,'Cantidad':Number(x.cantidad)||0,'Unidad':x.unidad||'','Precisión':x.precision||'','Estado':x.estado||'','Espacio':espName(x.espacioId),'Responsable':respName(x.responsableId),'Observaciones':x.observaciones||''})),
+  'Necesidades':L('necesidades').map(n=>({'Espacio':espName(n.espacioId),'Descripción':n.descripcion||'','Tipo':n.tipo||'','Prioridad':n.prioridad||'','Estado':n.estado||'','Seguimiento':n.atencion||'','Bien':n.bienCodigo||'','Reportó':n.reporto||'','Fecha':fdate(n.fecha)})),
+  'Responsables':L('responsables').sort((a,b)=>ncmp(a.nombre,b.nombre)).map(r=>({'Nombre':r.nombre,'Cargo':r.cargo||'','Turno':r.turno||'','Comisión / área':r.area||'','Correo':r.correo||'','Bienes activos':B.filter(b=>b.responsableId===r.id&&b.situacion!=='Baja').length})),
+  'Historial':Object.entries(mov).flatMap(([k,o])=>Object.values(o||{}).map(x=>({t:x.t,'Fecha':fdt(x.t),'Código':k,'Bien':S.bienes[k]?.descripcion||'(eliminado)','Movimiento':x.tipo||'','Detalle':x.det||'','Usuario':x.u||''}))).sort((a,b)=>b.t-a.t).map(({t,...r})=>r)
+ };
+ const wb=XLSX.utils.book_new();
+ Object.entries(sh).forEach(([n,rows])=>{const ws=rows.length?XLSX.utils.json_to_sheet(rows):XLSX.utils.aoa_to_sheet([['Sin registros']]);if(rows.length){const ks=Object.keys(rows[0]);ws['!cols']=ks.map(k=>({wch:Math.min(45,Math.max(k.length,...rows.slice(0,300).map(r=>String(r[k]??'').length))+2)}));ws['!autofilter']={ref:ws['!ref']}}XLSX.utils.book_append_sheet(wb,ws,n)});
+ XLSX.writeFile(wb,`base_de_datos_inventario_${today()}.xlsx`);toast('Base de datos descargada','ok');
 }
 function userForm(id){
  const u=id?{...S.usuarios[id]}:{rol:'responsable',activo:true};const self=id===ME.uid;
