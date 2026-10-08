@@ -7,15 +7,18 @@ ARCHIVOS (súbelos todos juntos a la misma carpeta / repositorio de GitHub):
   sw.js                 Hace que abra rápido y funcione aunque falle el internet
   icon-192.png, icon-512.png   Íconos de la app
 
-1) PROBARLA YA (modo local)
-   Abre index.html en el navegador. Sin configurar nada funciona en "modo local":
-   los datos se guardan solo en ese navegador. Útil para practicar.
+1) LA APP YA ESTÁ CONECTADA A TU FIREBASE "contralora"
+   Todos los equipos (computadoras y celulares) ven la misma información en tiempo real.
+   Pide usuario y contraseña al entrar. (Si algún día se borran los datos de FIREBASE_CONFIG,
+   la app funciona en "modo local", guardando solo en ese navegador.)
 
-2) ACTIVAR LA NUBE (para usarla desde varias computadoras y celulares)
-   a. Crea un proyecto en https://console.firebase.google.com
-   b. Compilación → Authentication → Comenzar → activa "Correo electrónico/contraseña".
-      Agrega ahí un primer usuario (el de la contralora o el tuyo).
-   c. Compilación → Realtime Database → Crear base de datos. En la pestaña "Reglas" pega:
+2) FIREBASE (proyecto "contralora") — YA ESTÁ CONECTADA EN index.html
+   Solo falta activar esto en la consola https://console.firebase.google.com (proyecto contralora):
+   a. Compilación → Authentication → Comenzar → activa "Correo electrónico/contraseña".
+      En la pestaña Usuarios agrega el primer usuario (el de la contralora o el tuyo).
+   b. Authentication → Configuración → Dominios autorizados → Agregar dominio:
+      mke210.github.io   (o el dominio donde publiques la app)
+   c. Compilación → Realtime Database → pestaña "Reglas", pega esto y Publicar:
 
       {
         "rules": {
@@ -26,16 +29,13 @@ ARCHIVOS (súbelos todos juntos a la misma carpeta / repositorio de GitHub):
         }
       }
 
-   d. Configuración del proyecto → Tus apps → ícono Web (</>) → registra la app y copia
-      los datos de "firebaseConfig".
-   e. Abre index.html con un editor y pega esos datos en FIREBASE_CONFIG (al inicio del
-      bloque <script> principal). Debe incluir databaseURL.
-   f. Sube los archivos a GitHub Pages.
-   g. Entra con el usuario del paso (b): el PRIMER usuario que entra queda como
-      Administrador. Desde Configuración → Usuarios das de alta a los demás.
+   d. Sube los archivos a GitHub Pages y entra con el usuario del paso (a).
+      El PRIMER usuario que entra queda como Administrador. Desde
+      Configuración → Usuarios das de alta a los demás.
 
-   Si ya capturaste datos en modo local: Configuración → Descargar respaldo, y después
-   en la versión en la nube: Configuración → Restaurar respaldo.
+   Fotos: se reducen automáticamente a ~15–40 KB cada una antes de guardarse.
+   Descargar la base de datos: Configuración → "Descargar en Excel" (una hoja por tabla)
+   o "Descargar respaldo (.json)" (copia exacta para restaurar).
 
 3) ROLES
    Administrador (contraloría): todo.
