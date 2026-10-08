@@ -393,7 +393,8 @@ function qrContent(code){const c=cfg();return(c.qrModo==='codigo'||!/^https?:\/\
 function parseCode(t){t=String(t||'').trim();const m=t.match(/[#?&]b=([^&\s]+)/);return(m?decodeURIComponent(m[1]):t).toUpperCase()}
 
 /* ---------- Estado y base de datos ---------- */
-const S={espacios:{},responsables:{},bienes:{},materiales:{},necesidades:{},config:{},usuarios:{}};
+const S={espacios:{},responsables:{},bienes:{},materiales:{},necesidades:{},config:{},usuarios:{},invitaciones:{}};
+const emailKey=e=>String(e||'').trim().toLowerCase().replace(/[.#$\[\]\/]/g,',');
 const COLS=Object.keys(S);
 let ME=null,CUR='inicio',fdb=null,PENDING=null,LOADED=new Set();
 const LSKEY='inventarioQR_local_v1';
@@ -1159,7 +1160,9 @@ function vConfig(){
   const U=L('usuarios').sort((a,b)=>ncmp(a.nombre,b.nombre));
   box.innerHTML=`<p class="muted" style="margin-top:0">El <b>administrador</b> (contraloría) controla todo. El <b>responsable</b> solo ve y actualiza lo que tiene bajo su resguardo, y genera su propio informe. <b>Solo consulta</b> ve todo sin modificar.</p>
   <div class="tw"><table class="rt"><thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Vinculado a</th><th>Estado</th><th></th></tr></thead><tbody>${U.map(u=>`<tr data-id="${u.id}"><td data-l="Nombre"><b>${esc(u.nombre)}</b></td><td data-l="Correo">${esc(u.email)}</td><td data-l="Rol">${esc(ROLES[u.rol]||u.rol)}</td><td data-l="Vinculado a">${esc(u.responsableId?respName(u.responsableId):'—')}</td><td data-l="Estado">${u.activo===false?pill('Inactivo',{Inactivo:'r'}):pill('Activo',{Activo:'g'})}</td><td data-l=""><button class="icon-btn" title="Editar">${ic('edit',16)}</button></td></tr>`).join('')}</tbody></table></div>
-  <div class="toolbar" style="margin:12px 0 0"><button class="btn pri" id="uAdd">${ic('plus')} Nuevo usuario</button></div>`;
+  ${(()=>{const I=L('invitaciones').sort((a,b)=>ncmp(a.nombre,b.nombre));return I.length?`<h3 class="sec">Autorizados, pendientes de su primer inicio de sesión</h3><div class="tw"><table class="rt"><thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Vinculado a</th><th></th></tr></thead><tbody>${I.map(i=>`<tr data-inv="${esc(i.id)}"><td data-l="Nombre"><b>${esc(i.nombre)}</b></td><td data-l="Correo">${esc(i.email)}</td><td data-l="Rol">${esc(ROLES[i.rol]||i.rol)}</td><td data-l="Vinculado a">${esc(i.responsableId?respName(i.responsableId):'—')}</td><td data-l=""><button class="btn sm dan">Quitar</button></td></tr>`).join('')}</tbody></table></div>`:''})()}
+  <div class="toolbar" style="margin:12px 0 0"><button class="btn pri" id="uAdd">${ic('plus')} Nuevo usuario / autorizar correo</button></div>`;
+  $$('#uBox tr[data-inv] .btn').forEach(b=>b.onclick=async()=>{const k=b.closest('tr').dataset.inv;if(await confirmDlg('¿Quitar esta autorización?','Quitar','dan'))await DB.remove('invitaciones/'+k)});
   $('#uAdd').onclick=()=>userForm();$$('#uBox tr[data-id] .icon-btn').forEach(b=>b.onclick=()=>userForm(b.closest('tr').dataset.id));
  };
  users();VIEWS.config.refresh=users;
@@ -1187,17 +1190,21 @@ function userForm(id){
  const u=id?{...S.usuarios[id]}:{rol:'responsable',activo:true};const self=id===ME.uid;
  const m=openModal({title:id?'Editar usuario':'Nuevo usuario',body:`<form class="fg" id="fu" onsubmit="return false">
   <label class="c2">Nombre completo *<input name="nombre" required value="${esc(u.nombre)}"></label>
-  ${id?`<label class="c2">Correo<input value="${esc(u.email)}" readonly></label>`:`<label>Correo *<input type="email" name="__email" required></label><label>Contraseña inicial *<input name="__pass" required minlength="6" placeholder="Mínimo 6 caracteres"></label>`}
+  ${id?`<label class="c2">Correo<input value="${esc(u.email)}" readonly></label>`:`<label>Correo *<input type="email" name="__email" required></label><label>Contraseña inicial<input name="__pass" minlength="6" placeholder="Mínimo 6 caracteres"></label>
+  <div class="c2 muted" style="font-size:12.5px;margin-top:-4px">Si la cuenta <b>ya la creaste en la consola de Firebase</b>, deja la contraseña vacía: solo se autoriza el correo y la persona entra con su contraseña de siempre.</div>`}
   <label>Rol<select name="rol" ${self?'disabled':''}>${opts(Object.entries(ROLES),u.rol)}</select></label>
   <label>Vincular con responsable<select name="responsableId">${respOpts(u.responsableId,'— Ninguno —')}</select><small>Necesario para el rol "Responsable".</small></label>
   ${id&&!self?`<label class="c2" style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" name="activo" ${u.activo!==false?'checked':''}> Usuario activo (desmarca para quitarle el acceso)</label>`:''}</form>`,
   actions:[...(id?[{label:'Enviar correo para cambiar contraseña',fn:async()=>{await firebase.auth().sendPasswordResetEmail(u.email);toast('Correo enviado a '+u.email,'ok')}}]:[]),CANCEL,{label:ic('check')+' Guardar',cls:'pri',fn:async(m)=>{const f=$('#fu',m);if(!f.reportValidity())return;const d=readForm(f);if(self)d.rol='admin';
    if(d.rol==='responsable'&&!d.responsableId)return toast('Vincula al usuario con un responsable','err');
    if(id){await DB.update('usuarios/'+id,d)}else{
-    const email=$('[name=__email]',f).value.trim(),pass=$('[name=__pass]',f).value;
+    const email=$('[name=__email]',f).value.trim().toLowerCase(),pass=$('[name=__pass]',f).value;
+    if(L('usuarios').some(x=>(x.email||'').toLowerCase()===email))return toast('Ese correo ya está dado de alta en la lista de usuarios','err');
+    const invitar=async msg=>{await DB.set('invitaciones/'+emailKey(email),{...d,email,activo:true,creado:Date.now(),por:ME.nombre});closeModal(m);toast(msg,'ok')};
+    if(!pass)return invitar(`${email} quedó autorizado. Entrará con su contraseña de Firebase.`);
     const sec=firebase.apps.find(a=>a.name==='sec')||firebase.initializeApp(FIREBASE_CONFIG,'sec');
     try{const cr=await sec.auth().createUserWithEmailAndPassword(email,pass);await DB.set('usuarios/'+cr.user.uid,{...d,email,activo:true,creado:Date.now()});await sec.auth().signOut()}
-    catch(e){throw new Error(authMsg(e))}}
+    catch(e){if(e.code==='auth/email-already-in-use')return invitar(`Ese correo ya tenía cuenta en Firebase: quedó autorizado y entrará con su contraseña actual.`);throw new Error(authMsg(e))}}
    closeModal(m);toast('Usuario guardado','ok')}}]});
 }
 
@@ -1242,8 +1249,10 @@ function boot(){
   try{
    let rec=(await fdb.ref(ROOT+'/usuarios/'+u.uid).once('value')).val();
    if(!rec){const any=(await fdb.ref(ROOT+'/usuarios').limitToFirst(1).once('value')).exists();
-    if(any){$('#loginErr').textContent='Tu cuenta no tiene acceso a esta app. Pide al administrador que te dé de alta.';await firebase.auth().signOut();return}
-    rec={email:u.email,nombre:u.email.split('@')[0],rol:'admin',activo:true,creado:Date.now()};await fdb.ref(ROOT+'/usuarios/'+u.uid).set(rec);toast('Eres el primer usuario: quedaste como administrador','ok')}
+    const iref=fdb.ref(ROOT+'/invitaciones/'+emailKey(u.email)),inv=any?(await iref.once('value')).val():null;
+    if(inv){rec={email:u.email,nombre:inv.nombre||u.email.split('@')[0],rol:inv.rol||'responsable',responsableId:inv.responsableId||'',activo:inv.activo!==false,creado:Date.now()};await fdb.ref(ROOT+'/usuarios/'+u.uid).set(rec);await iref.remove();toast('Bienvenido(a), '+rec.nombre,'ok')}
+    else if(any){$('#loginErr').innerHTML=`La cuenta <b>${esc(u.email)}</b> aún no está autorizada en esta app. Pide al administrador que la agregue en Configuración → Usuarios (basta con el correo).`;await firebase.auth().signOut();return}
+    else{rec={email:u.email,nombre:u.email.split('@')[0],rol:'admin',activo:true,creado:Date.now()};await fdb.ref(ROOT+'/usuarios/'+u.uid).set(rec);toast('Eres el primer usuario: quedaste como administrador','ok')}}
    if(rec.activo===false){$('#loginErr').textContent='Tu usuario está desactivado.';await firebase.auth().signOut();return}
    ME={uid:u.uid,...rec};
    fdb.ref(ROOT+'/usuarios/'+u.uid).on('value',sn=>{const v=sn.val();if(!v||v.activo===false){firebase.auth().signOut().then(()=>location.reload());return}const ch=v.rol!==ME.rol||v.responsableId!==ME.responsableId;ME={uid:u.uid,...v};if(ch){buildNav();go(CUR)}});
