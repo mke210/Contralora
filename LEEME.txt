@@ -1,0 +1,58 @@
+INVENTARIO ESCOLAR QR — Guía rápida
+===================================
+
+ARCHIVOS (súbelos todos juntos a la misma carpeta / repositorio de GitHub):
+  index.html            La app completa
+  manifest.webmanifest  Permite instalarla como app (Windows y Android)
+  sw.js                 Hace que abra rápido y funcione aunque falle el internet
+  icon-192.png, icon-512.png   Íconos de la app
+
+1) PROBARLA YA (modo local)
+   Abre index.html en el navegador. Sin configurar nada funciona en "modo local":
+   los datos se guardan solo en ese navegador. Útil para practicar.
+
+2) ACTIVAR LA NUBE (para usarla desde varias computadoras y celulares)
+   a. Crea un proyecto en https://console.firebase.google.com
+   b. Compilación → Authentication → Comenzar → activa "Correo electrónico/contraseña".
+      Agrega ahí un primer usuario (el de la contralora o el tuyo).
+   c. Compilación → Realtime Database → Crear base de datos. En la pestaña "Reglas" pega:
+
+      {
+        "rules": {
+          "inventario": {
+            ".read": "auth != null",
+            ".write": "auth != null"
+          }
+        }
+      }
+
+   d. Configuración del proyecto → Tus apps → ícono Web (</>) → registra la app y copia
+      los datos de "firebaseConfig".
+   e. Abre index.html con un editor y pega esos datos en FIREBASE_CONFIG (al inicio del
+      bloque <script> principal). Debe incluir databaseURL.
+   f. Sube los archivos a GitHub Pages.
+   g. Entra con el usuario del paso (b): el PRIMER usuario que entra queda como
+      Administrador. Desde Configuración → Usuarios das de alta a los demás.
+
+   Si ya capturaste datos en modo local: Configuración → Descargar respaldo, y después
+   en la versión en la nube: Configuración → Restaurar respaldo.
+
+3) ROLES
+   Administrador (contraloría): todo.
+   Responsable: ve y actualiza solo lo que tiene bajo su resguardo, reporta necesidades
+                y genera su propio informe. Hay que vincularlo con su nombre en Responsables.
+   Solo consulta: ve todo, sin modificar.
+
+4) FLUJO SUGERIDO
+   Responsables → Espacios (asignar responsable) → Alta de bienes (ej. 30 sillas = 30 códigos)
+   → Etiquetas QR (imprimir y pegar) → Escanear para revisar, hacer el levantamiento
+   físico o trasladar bienes → Informes (formato oficial por responsable, con firmas).
+
+5) ETIQUETAS
+   Imprime a escala 100 % (tamaño real), sin encabezados ni pies de página.
+   Para que salgan los colores del informe, activa "Gráficos de fondo" si el navegador lo pide.
+   El QR abre la ficha del bien directamente con la cámara del celular (si cambias la app
+   de dirección web, actualízala en Configuración y reimprime).
+
+6) CÁMARA
+   El escáner necesita abrir la app desde https (GitHub Pages) y dar permiso de cámara.

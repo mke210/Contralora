@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1F3864">
+<title>Inventario Escolar QR</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>/* qrcode-generator 1.4.4 · (c) Kazuhiko Arase · MIT */
+var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],f={},c=function(t,r){o=function(t){for(var r=new Array(t),e=0;e<t;e+=1){r[e]=new Array(t);for(var n=0;n<t;n+=1)r[e][n]=null}return r}(i=4*e+17),l(0,0),l(i-7,0),l(0,i-7),s(),h(),d(t,r),e>=7&&v(t),null==a&&(a=p(e,n,u)),w(a,r)},l=function(t,r){for(var e=-1;e<=7;e+=1)if(!(t+e<=-1||i<=t+e))for(var n=-1;n<=7;n+=1)r+n<=-1||i<=r+n||(o[t+e][r+n]=0<=e&&e<=6&&(0==n||6==n)||0<=n&&n<=6&&(0==e||6==e)||2<=e&&e<=4&&2<=n&&n<=4)},h=function(){for(var t=8;t<i-8;t+=1)null==o[t][6]&&(o[t][6]=t%2==0);for(var r=8;r<i-8;r+=1)null==o[6][r]&&(o[6][r]=r%2==0)},s=function(){for(var t=B.getPatternPosition(e),r=0;r<t.length;r+=1)for(var n=0;n<t.length;n+=1){var i=t[r],a=t[n];if(null==o[i][a])for(var u=-2;u<=2;u+=1)for(var f=-2;f<=2;f+=1)o[i+u][a+f]=-2==u||2==u||-2==f||2==f||0==u&&0==f}},v=function(t){for(var r=B.getBCHTypeNumber(e),n=0;n<18;n+=1){var a=!t&&1==(r>>n&1);o[Math.floor(n/3)][n%3+i-8-3]=a}for(n=0;n<18;n+=1){a=!t&&1==(r>>n&1);o[n%3+i-8-3][Math.floor(n/3)]=a}},d=function(t,r){for(var e=n<<3|r,a=B.getBCHTypeInfo(e),u=0;u<15;u+=1){var f=!t&&1==(a>>u&1);u<6?o[u][8]=f:u<8?o[u+1][8]=f:o[i-15+u][8]=f}for(u=0;u<15;u+=1){f=!t&&1==(a>>u&1);u<8?o[8][i-u-1]=f:u<9?o[8][15-u-1+1]=f:o[8][15-u-1]=f}o[i-8][8]=!t},w=function(t,r){for(var e=-1,n=i-1,a=7,u=0,f=B.getMaskFunction(r),c=i-1;c>0;c-=2)for(6==c&&(c-=1);;){for(var g=0;g<2;g+=1)if(null==o[n][c-g]){var l=!1;u<t.length&&(l=1==(t[u]>>>a&1)),f(n,c-g)&&(l=!l),o[n][c-g]=l,-1==(a-=1)&&(u+=1,a=7)}if((n+=e)<0||i<=n){n-=e,e=-e;break}}},p=function(t,r,e){for(var n=A.getRSBlocks(t,r),o=b(),i=0;i<e.length;i+=1){var a=e[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var u=0;for(i=0;i<n.length;i+=1)u+=n[i].dataCount;if(o.getLengthInBits()>8*u)throw"code length overflow. ("+o.getLengthInBits()+">"+8*u+")";for(o.getLengthInBits()+4<=8*u&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(!1);for(;!(o.getLengthInBits()>=8*u||(o.put(236,8),o.getLengthInBits()>=8*u));)o.put(17,8);return function(t,r){for(var e=0,n=0,o=0,i=new Array(r.length),a=new Array(r.length),u=0;u<r.length;u+=1){var f=r[u].dataCount,c=r[u].totalCount-f;n=Math.max(n,f),o=Math.max(o,c),i[u]=new Array(f);for(var g=0;g<i[u].length;g+=1)i[u][g]=255&t.getBuffer()[g+e];e+=f;var l=B.getErrorCorrectPolynomial(c),h=k(i[u],l.getLength()-1).mod(l);for(a[u]=new Array(l.getLength()-1),g=0;g<a[u].length;g+=1){var s=g+h.getLength()-a[u].length;a[u][g]=s>=0?h.getAt(s):0}}var v=0;for(g=0;g<r.length;g+=1)v+=r[g].totalCount;var d=new Array(v),w=0;for(g=0;g<n;g+=1)for(u=0;u<r.length;u+=1)g<i[u].length&&(d[w]=i[u][g],w+=1);for(g=0;g<o;g+=1)for(u=0;u<r.length;u+=1)g<a[u].length&&(d[w]=a[u][g],w+=1);return d}(o,n)};f.addData=function(t,r){var e=null;switch(r=r||"Byte"){case"Numeric":e=M(t);break;case"Alphanumeric":e=x(t);break;case"Byte":e=m(t);break;case"Kanji":e=L(t);break;default:throw"mode:"+r}u.push(e),a=null},f.isDark=function(t,r){if(t<0||i<=t||r<0||i<=r)throw t+","+r;return o[t][r]},f.getModuleCount=function(){return i},f.make=function(){if(e<1){for(var t=1;t<40;t++){for(var r=A.getRSBlocks(t,n),o=b(),i=0;i<u.length;i++){var a=u[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var g=0;for(i=0;i<r.length;i++)g+=r[i].dataCount;if(o.getLengthInBits()<=8*g)break}e=t}c(!1,function(){for(var t=0,r=0,e=0;e<8;e+=1){c(!0,e);var n=B.getLostPoint(f);(0==e||t>n)&&(t=n,r=e)}return r}())},f.createTableTag=function(t,r){t=t||2;var e="";e+='<table style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: "+(r=void 0===r?4*t:r)+"px;",e+='">',e+="<tbody>";for(var n=0;n<f.getModuleCount();n+=1){e+="<tr>";for(var o=0;o<f.getModuleCount();o+=1)e+='<td style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: 0px;",e+=" width: "+t+"px;",e+=" height: "+t+"px;",e+=" background-color: ",e+=f.isDark(n,o)?"#000000":"#ffffff",e+=";",e+='"/>';e+="</tr>"}return e+="</tbody>",e+="</table>"},f.createSvgTag=function(t,r,e,n){var o={};"object"==typeof arguments[0]&&(t=(o=arguments[0]).cellSize,r=o.margin,e=o.alt,n=o.title),t=t||2,r=void 0===r?4*t:r,(e="string"==typeof e?{text:e}:e||{}).text=e.text||null,e.id=e.text?e.id||"qrcode-description":null,(n="string"==typeof n?{text:n}:n||{}).text=n.text||null,n.id=n.text?n.id||"qrcode-title":null;var i,a,u,c,g=f.getModuleCount()*t+2*r,l="";for(c="l"+t+",0 0,"+t+" -"+t+",0 0,-"+t+"z ",l+='<svg version="1.1" xmlns="http://www.w3.org/2000/svg"',l+=o.scalable?"":' width="'+g+'px" height="'+g+'px"',l+=' viewBox="0 0 '+g+" "+g+'" ',l+=' preserveAspectRatio="xMinYMin meet"',l+=n.text||e.text?' role="img" aria-labelledby="'+y([n.id,e.id].join(" ").trim())+'"':"",l+=">",l+=n.text?'<title id="'+y(n.id)+'">'+y(n.text)+"</title>":"",l+=e.text?'<description id="'+y(e.id)+'">'+y(e.text)+"</description>":"",l+='<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>',l+='<path d="',a=0;a<f.getModuleCount();a+=1)for(u=a*t+r,i=0;i<f.getModuleCount();i+=1)f.isDark(a,i)&&(l+="M"+(i*t+r)+","+u+c);return l+='" stroke="transparent" fill="black"/>',l+="</svg>"},f.createDataURL=function(t,r){t=t||2,r=void 0===r?4*t:r;var e=f.getModuleCount()*t+2*r,n=r,o=e-r;return I(e,e,function(r,e){if(n<=r&&r<o&&n<=e&&e<o){var i=Math.floor((r-n)/t),a=Math.floor((e-n)/t);return f.isDark(a,i)?0:1}return 1})},f.createImgTag=function(t,r,e){t=t||2,r=void 0===r?4*t:r;var n=f.getModuleCount()*t+2*r,o="";return o+="<img",o+=' src="',o+=f.createDataURL(t,r),o+='"',o+=' width="',o+=n,o+='"',o+=' height="',o+=n,o+='"',e&&(o+=' alt="',o+=y(e),o+='"'),o+="/>"};var y=function(t){for(var r="",e=0;e<t.length;e+=1){var n=t.charAt(e);switch(n){case"<":r+="&lt;";break;case">":r+="&gt;";break;case"&":r+="&amp;";break;case'"':r+="&quot;";break;default:r+=n}}return r};return f.createASCII=function(t,r){if((t=t||1)<2)return function(t){t=void 0===t?2:t;var r,e,n,o,i,a=1*f.getModuleCount()+2*t,u=t,c=a-t,g={"██":"█","█ ":"▀"," █":"▄","  ":" "},l={"██":"▀","█ ":"▀"," █":" ","  ":" "},h="";for(r=0;r<a;r+=2){for(n=Math.floor((r-u)/1),o=Math.floor((r+1-u)/1),e=0;e<a;e+=1)i="█",u<=e&&e<c&&u<=r&&r<c&&f.isDark(n,Math.floor((e-u)/1))&&(i=" "),u<=e&&e<c&&u<=r+1&&r+1<c&&f.isDark(o,Math.floor((e-u)/1))?i+=" ":i+="█",h+=t<1&&r+1>=c?l[i]:g[i];h+="\n"}return a%2&&t>0?h.substring(0,h.length-a-1)+Array(a+1).join("▀"):h.substring(0,h.length-1)}(r);t-=1,r=void 0===r?2*t:r;var e,n,o,i,a=f.getModuleCount()*t+2*r,u=r,c=a-r,g=Array(t+1).join("██"),l=Array(t+1).join("  "),h="",s="";for(e=0;e<a;e+=1){for(o=Math.floor((e-u)/t),s="",n=0;n<a;n+=1)i=1,u<=n&&n<c&&u<=e&&e<c&&f.isDark(o,Math.floor((n-u)/t))&&(i=0),s+=i?g:l;for(o=0;o<t;o+=1)h+=s+"\n"}return h.substring(0,h.length-1)},f.renderTo2dContext=function(t,r){r=r||2;for(var e=f.getModuleCount(),n=0;n<e;n++)for(var o=0;o<e;o++)t.fillStyle=f.isDark(n,o)?"black":"white",t.fillRect(n*r,o*r,r,r)},f};t.stringToBytes=(t.stringToBytesFuncs={default:function(t){for(var r=[],e=0;e<t.length;e+=1){var n=t.charCodeAt(e);r.push(255&n)}return r}}).default,t.createStringToBytes=function(t,r){var e=function(){for(var e=S(t),n=function(){var t=e.read();if(-1==t)throw"eof";return t},o=0,i={};;){var a=e.read();if(-1==a)break;var u=n(),f=n()<<8|n();i[String.fromCharCode(a<<8|u)]=f,o+=1}if(o!=r)throw o+" != "+r;return i}(),n="?".charCodeAt(0);return function(t){for(var r=[],o=0;o<t.length;o+=1){var i=t.charCodeAt(o);if(i<128)r.push(i);else{var a=e[t.charAt(o)];"number"==typeof a?(255&a)==a?r.push(a):(r.push(a>>>8),r.push(255&a)):r.push(n)}}return r}};var r,e,n,o,i,a=1,u=2,f=4,c=8,g={L:1,M:0,Q:3,H:2},l=0,h=1,s=2,v=3,d=4,w=5,p=6,y=7,B=(r=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],e=1335,n=7973,i=function(t){for(var r=0;0!=t;)r+=1,t>>>=1;return r},(o={}).getBCHTypeInfo=function(t){for(var r=t<<10;i(r)-i(e)>=0;)r^=e<<i(r)-i(e);return 21522^(t<<10|r)},o.getBCHTypeNumber=function(t){for(var r=t<<12;i(r)-i(n)>=0;)r^=n<<i(r)-i(n);return t<<12|r},o.getPatternPosition=function(t){return r[t-1]},o.getMaskFunction=function(t){switch(t){case l:return function(t,r){return(t+r)%2==0};case h:return function(t,r){return t%2==0};case s:return function(t,r){return r%3==0};case v:return function(t,r){return(t+r)%3==0};case d:return function(t,r){return(Math.floor(t/2)+Math.floor(r/3))%2==0};case w:return function(t,r){return t*r%2+t*r%3==0};case p:return function(t,r){return(t*r%2+t*r%3)%2==0};case y:return function(t,r){return(t*r%3+(t+r)%2)%2==0};default:throw"bad maskPattern:"+t}},o.getErrorCorrectPolynomial=function(t){for(var r=k([1],0),e=0;e<t;e+=1)r=r.multiply(k([1,C.gexp(e)],0));return r},o.getLengthInBits=function(t,r){if(1<=r&&r<10)switch(t){case a:return 10;case u:return 9;case f:case c:return 8;default:throw"mode:"+t}else if(r<27)switch(t){case a:return 12;case u:return 11;case f:return 16;case c:return 10;default:throw"mode:"+t}else{if(!(r<41))throw"type:"+r;switch(t){case a:return 14;case u:return 13;case f:return 16;case c:return 12;default:throw"mode:"+t}}},o.getLostPoint=function(t){for(var r=t.getModuleCount(),e=0,n=0;n<r;n+=1)for(var o=0;o<r;o+=1){for(var i=0,a=t.isDark(n,o),u=-1;u<=1;u+=1)if(!(n+u<0||r<=n+u))for(var f=-1;f<=1;f+=1)o+f<0||r<=o+f||0==u&&0==f||a==t.isDark(n+u,o+f)&&(i+=1);i>5&&(e+=3+i-5)}for(n=0;n<r-1;n+=1)for(o=0;o<r-1;o+=1){var c=0;t.isDark(n,o)&&(c+=1),t.isDark(n+1,o)&&(c+=1),t.isDark(n,o+1)&&(c+=1),t.isDark(n+1,o+1)&&(c+=1),0!=c&&4!=c||(e+=3)}for(n=0;n<r;n+=1)for(o=0;o<r-6;o+=1)t.isDark(n,o)&&!t.isDark(n,o+1)&&t.isDark(n,o+2)&&t.isDark(n,o+3)&&t.isDark(n,o+4)&&!t.isDark(n,o+5)&&t.isDark(n,o+6)&&(e+=40);for(o=0;o<r;o+=1)for(n=0;n<r-6;n+=1)t.isDark(n,o)&&!t.isDark(n+1,o)&&t.isDark(n+2,o)&&t.isDark(n+3,o)&&t.isDark(n+4,o)&&!t.isDark(n+5,o)&&t.isDark(n+6,o)&&(e+=40);var g=0;for(o=0;o<r;o+=1)for(n=0;n<r;n+=1)t.isDark(n,o)&&(g+=1);return e+=Math.abs(100*g/r/r-50)/5*10},o),C=function(){for(var t=new Array(256),r=new Array(256),e=0;e<8;e+=1)t[e]=1<<e;for(e=8;e<256;e+=1)t[e]=t[e-4]^t[e-5]^t[e-6]^t[e-8];for(e=0;e<255;e+=1)r[t[e]]=e;var n={glog:function(t){if(t<1)throw"glog("+t+")";return r[t]},gexp:function(r){for(;r<0;)r+=255;for(;r>=256;)r-=255;return t[r]}};return n}();function k(t,r){if(void 0===t.length)throw t.length+"/"+r;var e=function(){for(var e=0;e<t.length&&0==t[e];)e+=1;for(var n=new Array(t.length-e+r),o=0;o<t.length-e;o+=1)n[o]=t[o+e];return n}(),n={getAt:function(t){return e[t]},getLength:function(){return e.length},multiply:function(t){for(var r=new Array(n.getLength()+t.getLength()-1),e=0;e<n.getLength();e+=1)for(var o=0;o<t.getLength();o+=1)r[e+o]^=C.gexp(C.glog(n.getAt(e))+C.glog(t.getAt(o)));return k(r,0)},mod:function(t){if(n.getLength()-t.getLength()<0)return n;for(var r=C.glog(n.getAt(0))-C.glog(t.getAt(0)),e=new Array(n.getLength()),o=0;o<n.getLength();o+=1)e[o]=n.getAt(o);for(o=0;o<t.getLength();o+=1)e[o]^=C.gexp(C.glog(t.getAt(o))+r);return k(e,0).mod(t)}};return n}var A=function(){var t=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],r=function(t,r){var e={};return e.totalCount=t,e.dataCount=r,e},e={};return e.getRSBlocks=function(e,n){var o=function(r,e){switch(e){case g.L:return t[4*(r-1)+0];case g.M:return t[4*(r-1)+1];case g.Q:return t[4*(r-1)+2];case g.H:return t[4*(r-1)+3];default:return}}(e,n);if(void 0===o)throw"bad rs block @ typeNumber:"+e+"/errorCorrectionLevel:"+n;for(var i=o.length/3,a=[],u=0;u<i;u+=1)for(var f=o[3*u+0],c=o[3*u+1],l=o[3*u+2],h=0;h<f;h+=1)a.push(r(c,l));return a},e}(),b=function(){var t=[],r=0,e={getBuffer:function(){return t},getAt:function(r){var e=Math.floor(r/8);return 1==(t[e]>>>7-r%8&1)},put:function(t,r){for(var n=0;n<r;n+=1)e.putBit(1==(t>>>r-n-1&1))},getLengthInBits:function(){return r},putBit:function(e){var n=Math.floor(r/8);t.length<=n&&t.push(0),e&&(t[n]|=128>>>r%8),r+=1}};return e},M=function(t){var r=a,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+2<r.length;)t.put(o(r.substring(n,n+3)),10),n+=3;n<r.length&&(r.length-n==1?t.put(o(r.substring(n,n+1)),4):r.length-n==2&&t.put(o(r.substring(n,n+2)),7))}},o=function(t){for(var r=0,e=0;e<t.length;e+=1)r=10*r+i(t.charAt(e));return r},i=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);throw"illegal char :"+t};return n},x=function(t){var r=u,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+1<r.length;)t.put(45*o(r.charAt(n))+o(r.charAt(n+1)),11),n+=2;n<r.length&&t.put(o(r.charAt(n)),6)}},o=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);if("A"<=t&&t<="Z")return t.charCodeAt(0)-"A".charCodeAt(0)+10;switch(t){case" ":return 36;case"$":return 37;case"%":return 38;case"*":return 39;case"+":return 40;case"-":return 41;case".":return 42;case"/":return 43;case":":return 44;default:throw"illegal char :"+t}};return n},m=function(r){var e=f,n=t.stringToBytes(r),o={getMode:function(){return e},getLength:function(t){return n.length},write:function(t){for(var r=0;r<n.length;r+=1)t.put(n[r],8)}};return o},L=function(r){var e=c,n=t.stringToBytesFuncs.SJIS;if(!n)throw"sjis not supported.";!function(){var t=n("友");if(2!=t.length||38726!=(t[0]<<8|t[1]))throw"sjis not supported."}();var o=n(r),i={getMode:function(){return e},getLength:function(t){return~~(o.length/2)},write:function(t){for(var r=o,e=0;e+1<r.length;){var n=(255&r[e])<<8|255&r[e+1];if(33088<=n&&n<=40956)n-=33088;else{if(!(57408<=n&&n<=60351))throw"illegal char at "+(e+1)+"/"+n;n-=49472}n=192*(n>>>8&255)+(255&n),t.put(n,13),e+=2}if(e<r.length)throw"illegal char at "+(e+1)}};return i},D=function(){var t=[],r={writeByte:function(r){t.push(255&r)},writeShort:function(t){r.writeByte(t),r.writeByte(t>>>8)},writeBytes:function(t,e,n){e=e||0,n=n||t.length;for(var o=0;o<n;o+=1)r.writeByte(t[o+e])},writeString:function(t){for(var e=0;e<t.length;e+=1)r.writeByte(t.charCodeAt(e))},toByteArray:function(){return t},toString:function(){var r="";r+="[";for(var e=0;e<t.length;e+=1)e>0&&(r+=","),r+=t[e];return r+="]"}};return r},S=function(t){var r=t,e=0,n=0,o=0,i={read:function(){for(;o<8;){if(e>=r.length){if(0==o)return-1;throw"unexpected end of file./"+o}var t=r.charAt(e);if(e+=1,"="==t)return o=0,-1;t.match(/^\s$/)||(n=n<<6|a(t.charCodeAt(0)),o+=6)}var i=n>>>o-8&255;return o-=8,i}},a=function(t){if(65<=t&&t<=90)return t-65;if(97<=t&&t<=122)return t-97+26;if(48<=t&&t<=57)return t-48+52;if(43==t)return 62;if(47==t)return 63;throw"c:"+t};return i},I=function(t,r,e){for(var n=function(t,r){var e=t,n=r,o=new Array(t*r),i={setPixel:function(t,r,n){o[r*e+t]=n},write:function(t){t.writeString("GIF87a"),t.writeShort(e),t.writeShort(n),t.writeByte(128),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(255),t.writeByte(255),t.writeByte(255),t.writeString(","),t.writeShort(0),t.writeShort(0),t.writeShort(e),t.writeShort(n),t.writeByte(0);var r=a(2);t.writeByte(2);for(var o=0;r.length-o>255;)t.writeByte(255),t.writeBytes(r,o,255),o+=255;t.writeByte(r.length-o),t.writeBytes(r,o,r.length-o),t.writeByte(0),t.writeString(";")}},a=function(t){for(var r=1<<t,e=1+(1<<t),n=t+1,i=u(),a=0;a<r;a+=1)i.add(String.fromCharCode(a));i.add(String.fromCharCode(r)),i.add(String.fromCharCode(e));var f,c,g,l=D(),h=(f=l,c=0,g=0,{write:function(t,r){if(t>>>r!=0)throw"length over";for(;c+r>=8;)f.writeByte(255&(t<<c|g)),r-=8-c,t>>>=8-c,g=0,c=0;g|=t<<c,c+=r},flush:function(){c>0&&f.writeByte(g)}});h.write(r,n);var s=0,v=String.fromCharCode(o[s]);for(s+=1;s<o.length;){var d=String.fromCharCode(o[s]);s+=1,i.contains(v+d)?v+=d:(h.write(i.indexOf(v),n),i.size()<4095&&(i.size()==1<<n&&(n+=1),i.add(v+d)),v=d)}return h.write(i.indexOf(v),n),h.write(e,n),h.flush(),l.toByteArray()},u=function(){var t={},r=0,e={add:function(n){if(e.contains(n))throw"dup key:"+n;t[n]=r,r+=1},size:function(){return r},indexOf:function(r){return t[r]},contains:function(r){return void 0!==t[r]}};return e};return i}(t,r),o=0;o<r;o+=1)for(var i=0;i<t;i+=1)n.setPixel(i,o,e(i,o));var a=D();n.write(a);for(var u=function(){var t=0,r=0,e=0,n="",o={},i=function(t){n+=String.fromCharCode(a(63&t))},a=function(t){if(t<0);else{if(t<26)return 65+t;if(t<52)return t-26+97;if(t<62)return t-52+48;if(62==t)return 43;if(63==t)return 47}throw"n:"+t};return o.writeByte=function(n){for(t=t<<8|255&n,r+=8,e+=1;r>=6;)i(t>>>r-6),r-=6},o.flush=function(){if(r>0&&(i(t<<6-r),t=0,r=0),e%3!=0)for(var o=3-e%3,a=0;a<o;a+=1)n+="="},o.toString=function(){return n},o}(),f=a.toByteArray(),c=0;c<f.length;c+=1)u.writeByte(f[c]);return u.flush(),"data:image/gif;base64,"+u};return t}();qrcode.stringToBytesFuncs["UTF-8"]=function(t){return function(t){for(var r=[],e=0;e<t.length;e++){var n=t.charCodeAt(e);n<128?r.push(n):n<2048?r.push(192|n>>6,128|63&n):n<55296||n>=57344?r.push(224|n>>12,128|n>>6&63,128|63&n):(e++,n=65536+((1023&n)<<10|1023&t.charCodeAt(e)),r.push(240|n>>18,128|n>>12&63,128|n>>6&63,128|63&n))}return r}(t)},function(t){"function"==typeof define&&define.amd?define([],t):"object"==typeof exports&&(module.exports=t())}(function(){return qrcode});
+</script>
+<style>
+:root{--navy:#1F3864;--navy2:#2B4A80;--gold:#C9A227;--bg:#F3F5F9;--card:#fff;--line:#E1E6EF;--txt:#1C2433;--mut:#6B7588;
+--g:#1E8E4E;--gbg:#E3F5EA;--a:#B7791F;--abg:#FDF3DC;--r:#C0392B;--rbg:#FBE5E2;--p:#6D3FC0;--pbg:#EEE6FB;--n:#5E6675;--nbg:#ECEEF2;--rad:12px}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:"Segoe UI",Roboto,system-ui,-apple-system,Arial,sans-serif;background:var(--bg);color:var(--txt);font-size:15px;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+.ic{flex:none;vertical-align:middle}
+[hidden]{display:none!important}
+
+/* Login */
+#login{min-height:100%;display:grid;place-items:center;padding:20px;background:linear-gradient(160deg,var(--navy) 0%,#13244A 60%,#0E1B38 100%)}
+.lbox{background:#fff;width:100%;max-width:380px;border-radius:18px;padding:30px 26px;box-shadow:0 20px 50px rgba(0,0,0,.35);text-align:center}
+.lbox .logo{width:72px;height:72px;border-radius:18px;background:var(--navy);color:var(--gold);display:grid;place-items:center;margin:0 auto 12px}
+.lbox h1{font-size:20px;margin:6px 0 2px;color:var(--navy)}
+.lbox p{margin:0 0 20px;color:var(--mut);font-size:13px}
+.lbox label{text-align:left}
+#loginErr{color:var(--r);font-size:13px;min-height:18px;margin:6px 0}
+
+/* Shell */
+#app{display:flex;min-height:100%}
+#side{width:240px;background:var(--navy);color:#DCE3F0;display:flex;flex-direction:column;position:fixed;inset:0 auto 0 0;z-index:40;transition:transform .25s}
+.brand{display:flex;gap:10px;align-items:center;padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.1)}
+.brand .bl{width:38px;height:38px;border-radius:10px;background:var(--gold);color:var(--navy);display:grid;place-items:center}
+.brand b{display:block;color:#fff;font-size:15px;line-height:1.1}
+.brand small{font-size:11px;opacity:.75}
+#nav{flex:1;overflow:auto;padding:10px 8px}
+#nav button{display:flex;gap:11px;align-items:center;width:100%;background:none;border:0;color:inherit;padding:10px 12px;border-radius:9px;cursor:pointer;text-align:left;font-size:14.5px}
+#nav button:hover{background:rgba(255,255,255,.07)}
+#nav button.on{background:rgba(201,162,39,.18);color:#fff;box-shadow:inset 3px 0 0 var(--gold)}
+#nav .bdg{margin-left:auto;background:var(--r);color:#fff;font-size:11px;border-radius:10px;padding:1px 7px}
+.sfoot{padding:12px 14px;border-top:1px solid rgba(255,255,255,.1);font-size:12.5px}
+.sfoot .who{color:#fff;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sfoot .role{opacity:.7;margin-bottom:8px}
+.sfoot button{background:rgba(255,255,255,.08);border:0;color:#fff;border-radius:8px;padding:7px 10px;cursor:pointer;display:inline-flex;gap:6px;align-items:center;font-size:12.5px;margin:2px 0}
+.sfoot .pw{opacity:.55;font-size:11px;margin-top:8px}
+main{flex:1;margin-left:240px;min-width:0;display:flex;flex-direction:column}
+.top{position:sticky;top:0;z-index:20;background:rgba(243,245,249,.92);backdrop-filter:blur(8px);display:flex;align-items:center;gap:10px;padding:12px 22px;border-bottom:1px solid var(--line)}
+.top h2{margin:0;font-size:19px;color:var(--navy);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#hamb{display:none}
+.mode{font-size:11.5px;padding:3px 9px;border-radius:20px;background:var(--abg);color:var(--a);font-weight:600;white-space:nowrap}
+.mode.cloud{background:var(--gbg);color:var(--g)}
+#view{padding:20px 22px 90px;max-width:1300px;width:100%}
+#scrim{display:none}
+
+/* Generic */
+.btn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 13px;cursor:pointer;font-size:14px;white-space:nowrap;transition:.15s}
+.btn:hover{border-color:#C5CEDD;background:#FAFBFD}
+.btn.pri{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn.pri:hover{background:var(--navy2)}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#1B1B1B;font-weight:600}
+.btn.dan{color:var(--r);border-color:#F0C5BF}
+.btn.sm{padding:5px 9px;font-size:13px}
+.btn:disabled{opacity:.55;cursor:wait}
+.icon-btn{border:0;background:none;cursor:pointer;padding:6px;border-radius:8px;color:var(--mut);display:inline-grid;place-items:center}
+.icon-btn:hover{background:var(--nbg);color:var(--txt)}
+label{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:#3A4459}
+label small{font-weight:400;color:var(--mut)}
+input,select,textarea{border:1px solid #CFD6E2;border-radius:9px;padding:9px 11px;background:#fff;font-size:14.5px;font-weight:400;min-width:0;width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid rgba(31,56,100,.25);border-color:var(--navy)}
+input[type=checkbox]{width:auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--rad);padding:16px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.toolbar .grow{flex:1 1 220px;position:relative}
+.toolbar .grow .ic{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--mut)}
+.toolbar .grow input{padding-left:34px}
+.toolbar select{width:auto;max-width:200px}
+.sp{flex:1}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:20px;background:var(--nbg);color:var(--n);white-space:nowrap}
+.pill.g{background:var(--gbg);color:var(--g)}.pill.a{background:var(--abg);color:var(--a)}.pill.r{background:var(--rbg);color:var(--r)}.pill.p{background:var(--pbg);color:var(--p)}.pill.n{background:var(--nbg);color:var(--n)}
+.muted{color:var(--mut)}
+.empty{text-align:center;color:var(--mut);padding:40px 10px}
+.empty .ic{color:#B9C2D3;margin-bottom:8px}
+h3.sec{font-size:15px;color:var(--navy);margin:22px 0 10px;display:flex;align-items:center;gap:8px}
+
+/* Table */
+.tw{background:#fff;border:1px solid var(--line);border-radius:var(--rad);overflow:auto}
+table.rt{width:100%;border-collapse:collapse;font-size:14px}
+.rt th{background:#F7F9FC;text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--mut);padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+.rt td{padding:10px 12px;border-bottom:1px solid #EEF1F6;vertical-align:middle}
+.rt tr:last-child td{border-bottom:0}
+.rt tbody tr.ck{cursor:pointer}
+.rt tbody tr.ck:hover{background:#F8FAFD}
+.rt .code{font-family:Consolas,"Roboto Mono",monospace;font-weight:700;color:var(--navy);white-space:nowrap}
+.rt .sub{font-size:12px;color:var(--mut)}
+.selbar{display:flex;gap:8px;align-items:center;background:#FFF8E1;border:1px solid #F1DFA4;border-radius:10px;padding:8px 12px;margin-bottom:12px;font-size:14px;flex-wrap:wrap}
+.more{text-align:center;padding:14px}
+.qty{display:inline-flex;align-items:center;gap:6px}
+.qty b{min-width:34px;text-align:center}
+
+/* Dashboard */
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:var(--rad);padding:14px 16px;cursor:pointer;transition:.15s}
+.kpi:hover{border-color:#C5CEDD;transform:translateY(-1px)}
+.kpi .v{font-size:28px;font-weight:700;color:var(--navy);line-height:1.1}
+.kpi .l{font-size:13px;color:var(--mut);margin-top:3px}
+.kpi.r .v{color:var(--r)}.kpi.a .v{color:var(--a)}.kpi.g .v{color:var(--g)}.kpi.p .v{color:var(--p)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.bars .br{display:grid;grid-template-columns:minmax(90px,38%) 1fr 40px;gap:10px;align-items:center;font-size:13.5px;padding:5px 0}
+.bars .br span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bars .bt{height:10px;background:#EEF1F6;border-radius:6px;overflow:hidden}
+.bars .bt i{display:block;height:100%;background:var(--navy);border-radius:6px}
+.bars .br b{text-align:right}
+.prog{height:10px;background:#EEF1F6;border-radius:6px;overflow:hidden;margin:8px 0 4px}
+.prog i{display:block;height:100%;background:var(--g)}
+.welcome{background:linear-gradient(120deg,var(--navy),#2D4E8C);color:#fff;border-radius:var(--rad);padding:18px 20px;margin-bottom:14px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.welcome h3{margin:0;font-size:18px}
+.welcome p{margin:3px 0 0;opacity:.8;font-size:13.5px}
+.welcome .btn{margin-left:auto}
+
+/* Cards grid */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.ec{background:#fff;border:1px solid var(--line);border-radius:var(--rad);padding:14px;display:flex;flex-direction:column;gap:8px}
+.ec h4{margin:0;font-size:16px;color:var(--navy)}
+.ec .meta{font-size:13px;color:var(--mut);display:flex;flex-direction:column;gap:3px}
+.ec .meta span{display:flex;gap:6px;align-items:center}
+.ec .stats{display:flex;gap:6px;flex-wrap:wrap}
+.ec .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto;padding-top:6px;border-top:1px solid #EEF1F6}
+.nc{border-left:4px solid var(--n)}
+.nc.Alta{border-left-color:var(--r)}.nc.Media{border-left-color:var(--a)}
+.nc p{margin:0;font-size:14px}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(14,22,40,.5);z-index:100;display:flex;align-items:flex-start;justify-content:center;padding:4vh 14px;overflow:auto;animation:fi .15s}
+@keyframes fi{from{opacity:0}}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:520px;box-shadow:0 25px 60px rgba(0,0,0,.3);display:flex;flex-direction:column;max-height:none}
+.modal.wide{max-width:820px}
+.mh{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)}
+.mh h3{margin:0;font-size:17px;flex:1;color:var(--navy)}
+.mb{padding:18px}
+.mf{display:flex;gap:8px;justify-content:flex-end;padding:12px 18px;border-top:1px solid var(--line);flex-wrap:wrap}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg .c2{grid-column:1/-1}
+.ctab{width:100%;border-collapse:collapse;font-size:13.5px}
+.ctab th,.ctab td{border-bottom:1px solid #EEF1F6;padding:6px 4px;text-align:left}
+.ctab .rg{display:flex;gap:4px}
+.ctab .rg label{flex-direction:row;align-items:center;gap:3px;font-weight:600;font-size:12.5px}
+.ctab input[type=text]{padding:6px 8px;font-size:13.5px}
+
+/* Ficha */
+.ficha{display:grid;grid-template-columns:200px 1fr;gap:20px}
+.fq{text-align:center}
+.fq svg{width:180px;height:180px;border:1px solid var(--line);border-radius:10px;padding:6px;background:#fff}
+.fcode{font-family:Consolas,monospace;font-weight:700;font-size:20px;color:var(--navy);margin-top:6px}
+#fFoto img{width:180px;border-radius:10px;margin-top:10px;border:1px solid var(--line)}
+.fd h2{margin:0 0 8px;font-size:21px}
+.fd .pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.fd dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;font-size:14px}
+.fd dt{color:var(--mut)}
+.fd dd{margin:0;font-weight:500}
+.hist{max-height:220px;overflow:auto;font-size:13.5px}
+.hist div{padding:7px 0;border-bottom:1px dashed var(--line);display:flex;gap:10px}
+.hist time{color:var(--mut);white-space:nowrap;font-size:12.5px;min-width:96px}
+
+/* Scanner */
+.scanw{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+#reader{width:100%;min-height:260px;background:#0E1B38;border-radius:var(--rad);overflow:hidden;display:grid;place-items:center;color:#9FB0D0}
+#reader video{width:100%!important;border-radius:var(--rad)}
+.slist{max-height:420px;overflow:auto}
+.slist div{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #EEF1F6;font-size:14px}
+.flash{animation:fl .6s}
+@keyframes fl{0%{box-shadow:0 0 0 0 rgba(30,142,78,.7)}100%{box-shadow:0 0 0 18px rgba(30,142,78,0)}}
+
+/* Labels (screen + print) */
+.sheet{display:flex;flex-wrap:wrap;gap:2mm;align-content:flex-start}
+.lbl{display:flex;gap:2mm;align-items:center;border:.3mm dashed #9AA3B2;padding:1.5mm;background:#fff;color:#000;overflow:hidden;break-inside:avoid;page-break-inside:avoid;font-family:Arial,sans-serif}
+.lbl .lq svg{display:block}
+.lbl .lt{min-width:0;flex:1;display:flex;flex-direction:column;justify-content:center;line-height:1.15}
+.lbl .ls{font-size:5.5pt;font-weight:700;text-transform:uppercase;color:#1F3864;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lbl .lc{font-family:Consolas,"Courier New",monospace;font-weight:700;letter-spacing:.2px}
+.lbl .ld,.lbl .le{overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+.lbl .le{color:#444}
+.lbl.S{width:45mm;height:25mm}.lbl.S .lq svg{width:21mm;height:21mm}.lbl.S .lc{font-size:9pt}.lbl.S .ld{font-size:6pt}.lbl.S .le{font-size:5.5pt;-webkit-line-clamp:1}
+.lbl.M{width:64mm;height:34mm}.lbl.M .lq svg{width:30mm;height:30mm}.lbl.M .ls{font-size:6.5pt}.lbl.M .lc{font-size:12pt}.lbl.M .ld{font-size:7.5pt}.lbl.M .le{font-size:6.5pt}
+.lbl.L{width:92mm;height:46mm}.lbl.L .lq svg{width:41mm;height:41mm}.lbl.L .ls{font-size:8pt}.lbl.L .lc{font-size:16pt}.lbl.L .ld{font-size:10pt}.lbl.L .le{font-size:8.5pt}
+.prev{background:#E9EDF3;border-radius:var(--rad);padding:16px;overflow:auto;max-height:70vh}
+
+/* Toast */
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+#toast div{background:#1C2433;color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:fi .2s;max-width:90vw}
+#toast div.err{background:var(--r)}#toast div.ok{background:var(--g)}
+#fab{display:none}
+#printArea{display:none}
+
+/* Responsive */
+@media(max-width:900px){
+ #side{transform:translateX(-100%)}
+ body.nav-open #side{transform:none}
+ body.nav-open #scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:30}
+ main{margin-left:0}
+ #hamb{display:inline-grid}
+ .top{padding:10px 12px}
+ #view{padding:14px 12px 100px}
+ .grid2,.scanw{grid-template-columns:1fr}
+ #fab{display:grid;place-items:center;position:fixed;right:18px;bottom:20px;width:58px;height:58px;border-radius:50%;background:var(--gold);color:var(--navy);border:0;box-shadow:0 8px 22px rgba(0,0,0,.3);z-index:25;cursor:pointer}
+}
+@media(max-width:640px){
+ .fg{grid-template-columns:1fr}
+ .ficha{grid-template-columns:1fr}
+ .toolbar select{max-width:none;flex:1 1 45%}
+ .modal-bg{padding:0}
+ .modal{border-radius:0;min-height:100%}
+ table.rt thead{display:none}
+ table.rt,table.rt tbody,table.rt tr,table.rt td{display:block;width:100%}
+ table.rt tr{border-bottom:8px solid var(--bg);padding:6px 0}
+ table.rt td{display:flex;justify-content:space-between;gap:12px;border:0;padding:5px 12px;text-align:right}
+ table.rt td::before{content:attr(data-l);font-weight:600;color:var(--mut);font-size:12.5px;text-align:left}
+ table.rt td[data-l=""]::before{content:none}
+ .welcome .btn{margin-left:0}
+}
+
+/* Print */
+@media print{
+ @page{size:letter;margin:10mm}
+ body{background:#fff}
+ body>*:not(#printArea){display:none!important}
+ #printArea{display:block!important}
+ .lbl{border-color:#BBB}
+}
+#printArea,#printArea *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+#printArea.rep{font-family:Arial,sans-serif;color:#000;font-size:10pt}
+.rep h1{font-size:13pt;text-align:center;margin:0}
+.rep .sub{text-align:center;font-size:9pt;margin:0 0 8px}
+.rep h2{font-size:11.5pt;text-align:center;color:#1F3864;margin:8px 0 10px}
+.rep h3{font-size:10.5pt;color:#1F3864;border-bottom:1.5px solid #1F3864;padding-bottom:2px;margin:14px 0 6px;break-after:avoid}
+.rep h4{font-size:10pt;margin:10px 0 4px;break-after:avoid}
+.rep table{width:100%;border-collapse:collapse;margin-bottom:6px}
+.rep th{background:#1F3864;color:#fff;font-size:8.5pt;padding:4px;border:1px solid #808080}
+.rep td{border:1px solid #808080;padding:3px 5px;font-size:9pt;vertical-align:top}
+.rep td.k{background:#DCE3F0;font-weight:700;width:22%}
+.rep tr{break-inside:avoid}
+.rep .firmas{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:40px;text-align:center;font-size:9pt;break-inside:avoid}
+.rep .firmas div{border-top:1px solid #000;padding-top:4px}
+.rep .decl{font-style:italic;margin-top:14px;font-size:9pt;text-align:justify}
+.rep p{margin:4px 0}
+</style>
+</head>
+<body>
+
+<div id="login" hidden>
+ <div class="lbox">
+  <div class="logo" id="lgIcon"></div>
+  <h1>Inventario Escolar QR</h1>
+  <p id="lgSchool">Control de bienes, espacios y materiales</p>
+  <form id="lgForm" style="display:grid;gap:12px">
+   <label>Correo<input type="email" id="lgEmail" autocomplete="username" required></label>
+   <label>Contraseña<input type="password" id="lgPass" autocomplete="current-password" required></label>
+   <div id="loginErr"></div>
+   <button class="btn pri" style="justify-content:center;padding:11px">Entrar</button>
+   <button type="button" class="btn" id="lgReset" style="justify-content:center;border:0;color:var(--mut)">Olvidé mi contraseña</button>
+  </form>
+ </div>
+</div>
+
+<div id="app" hidden>
+ <aside id="side">
+  <div class="brand"><div class="bl" id="brIcon"></div><div><b>Inventario QR</b><small id="brSchool">Contraloría escolar</small></div></div>
+  <nav id="nav"></nav>
+  <div class="sfoot">
+   <div class="who" id="who"></div><div class="role" id="role"></div>
+   <button id="btnInstall" hidden></button>
+   <button id="btnOut"></button>
+   <div class="pw">Powered by ElProfeChan</div>
+  </div>
+ </aside>
+ <div id="scrim"></div>
+ <main>
+  <header class="top">
+   <button class="icon-btn" id="hamb" aria-label="Menú"></button>
+   <h2 id="title">Inicio</h2>
+   <span class="mode" id="modeTag"></span>
+  </header>
+  <section id="view"></section>
+ </main>
+ <button id="fab" aria-label="Escanear QR"></button>
+</div>
+
+<div id="modalRoot"></div>
+<div id="toast"></div>
+<div id="printArea"></div>
+
+<script>
+/* =====================================================================
+   CONFIGURACIÓN DE FIREBASE
+   Pega aquí los datos de tu proyecto (Consola de Firebase → Configuración
+   del proyecto → Tus apps → Web). Si lo dejas vacío, la app funciona en
+   "modo local" (los datos se guardan solo en este navegador).
+   ===================================================================== */
+const FIREBASE_CONFIG = {
+  apiKey: "",
+  authDomain: "",
+  databaseURL: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
+};
+const ROOT = 'inventario';           // carpeta raíz dentro de Realtime Database
+const H5Q = 'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';
+
+/* ---------- Catálogos ---------- */
+const ESTADOS=['Bueno','Regular','Malo'];
+const SITUACIONES=['En uso','En reparación','Dañado','Faltante','Baja'];
+const FUNCIONA=['Sí','No','No aplica'];
+const TIPOS_ESP=['Aula','Laboratorio','Taller','Sala de cómputo','Biblioteca','Oficina','Dirección / Subdirección','Bodega','Sanitarios','Patio / Cancha','Auditorio','Cooperativa','Comisión','Otro'];
+const ELEMENTOS=['Paredes y muros','Piso','Techo / losa','Puertas y cerraduras','Ventanas y vidrios','Instalación eléctrica (contactos, apagadores)','Iluminación (lámparas)','Ventilación (ventiladores)','Pizarrón / pintarrón','Pintura','Impermeabilización / filtraciones'];
+const CATS_DEF=['Mobiliario','Equipo de cómputo','Equipo audiovisual','Equipo de laboratorio','Herramienta','Material deportivo','Instrumento musical','Equipo de oficina','Electrodoméstico','Equipo de limpieza','Otro'];
+const NEC_TIPOS=['Mantenimiento','Reparación','Adecuación','Adquisición','Otra'];
+const PRIORIDADES=['Alta','Media','Baja'];
+const NEC_ESTADOS=['Pendiente','En proceso','Atendida'];
+const UNIDADES=['piezas','cajas','paquetes','juegos','resmas','rollos','botes','litros','kilos','metros'];
+const ROLES={admin:'Administrador (Contraloría)',responsable:'Responsable de espacio',consulta:'Solo consulta'};
+const PE={Bueno:'g',Regular:'a',Malo:'r'}, PS={'En uso':'g','En reparación':'a','Dañado':'r','Faltante':'p','Baja':'n'}, PF={'Sí':'g','No':'r'}, PP={Alta:'r',Media:'a',Baja:'n'}, PN={Pendiente:'r','En proceso':'a',Atendida:'g'};
+
+/* ---------- Íconos ---------- */
+const IC={home:'M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z',box:'M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8',pin:'M12 22s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12zM12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z',layers:'M12 2l10 5-10 5L2 7zM2 12l10 5 10-5M2 17l10 5 10-5',alert:'M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01',users:'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8',qr:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h3v3h-3zM18 18h3v3h-3zM14 20h2M20 14v2',scan:'M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10',file:'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h8',gear:'M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6',logout:'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9',plus:'M12 5v14M5 12h14',edit:'M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z',trash:'M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6',print:'M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z',download:'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3',upload:'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12',search:'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3',check:'M20 6L9 17l-5-5',x:'M18 6L6 18M6 6l12 12',menu:'M3 6h18M3 12h18M3 18h18',camera:'M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',user:'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',install:'M12 3v12M7 10l5 5 5-5M5 21h14'};
+const ic=(n,s=18)=>`<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${IC[n]}"/></svg>`;
+
+/* ---------- Utilidades ---------- */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const today=()=>{const d=new Date();return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+const fdate=t=>t?new Date(t).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}):'—';
+const fdt=t=>t?new Date(t).toLocaleString('es-MX',{day:'2-digit',month:'short',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
+const fdLong=()=>new Date().toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});
+const norm=s=>String(s??'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+const ncmp=(a,b)=>String(a??'').localeCompare(String(b??''),'es',{numeric:true,sensitivity:'base'});
+const opts=(arr,sel,blank)=>(blank!==undefined?`<option value="">${esc(blank)}</option>`:'')+arr.map(o=>{const[v,l]=Array.isArray(o)?o:[o,o];return`<option value="${esc(v)}"${String(v)===String(sel??'')?' selected':''}>${esc(l)}</option>`}).join('');
+const pill=(v,m)=>`<span class="pill ${m[v]||'n'}">${esc(v||'—')}</span>`;
+const debounce=(f,ms=200)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>f(...a),ms)}};
+function toast(msg,cls=''){const d=document.createElement('div');d.className=cls;d.textContent=msg;$('#toast').append(d);setTimeout(()=>d.remove(),3200)}
+function readForm(f){const o={};$$('[name]',f).forEach(el=>{if(el.name.startsWith('__')||el.type==='file')return;if(el.type==='checkbox')o[el.name]=el.checked;else if(el.type==='number')o[el.name]=el.value===''?'':Number(el.value);else o[el.name]=el.value.trim()});return o}
+function dl(name,content,type='text/plain'){const b=new Blob([content],{type});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+function beep(ok=true){try{const A=window._ac||(window._ac=new(window.AudioContext||window.webkitAudioContext)());const o=A.createOscillator(),g=A.createGain();o.frequency.value=ok?1046:220;o.type=ok?'sine':'square';g.gain.setValueAtTime(.18,A.currentTime);g.gain.exponentialRampToValueAtTime(.001,A.currentTime+(ok?.18:.35));o.connect(g).connect(A.destination);o.start();o.stop(A.currentTime+(ok?.18:.35));if(navigator.vibrate)navigator.vibrate(ok?60:[80,60,80])}catch(e){}}
+function compressImg(file,max=640){return new Promise((ok,ko)=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,max/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/jpeg',.72))};im.onerror=ko;im.src=r.result};r.onerror=ko;r.readAsDataURL(file)})}
+function loadScript(src){return new Promise((ok,ko)=>{if($(`script[src="${src}"]`)&&window.Html5Qrcode)return ok();const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>ko(new Error('No se pudo cargar el lector de QR. Revisa tu conexión.'));document.head.append(s)})}
+
+/* ---------- QR ---------- */
+function qrSVG(text){
+ if(typeof qrcode==='undefined')return'<svg viewBox="0 0 10 10"><text x="1" y="6" font-size="2">QR</text></svg>';
+ const q=qrcode(0,'M');q.addData(text);q.make();const n=q.getModuleCount();let d='';
+ for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))d+=`M${c} ${r}h1v1h-1z`;
+ return`<svg viewBox="-2 -2 ${n+4} ${n+4}" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect x="-2" y="-2" width="${n+4}" height="${n+4}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`;
+}
+function qrContent(code){const c=cfg();return(c.qrModo==='codigo'||!/^https?:\/\//.test(c.urlBase))?code:c.urlBase.replace(/#.*$/,'')+'#b='+encodeURIComponent(code)}
+function parseCode(t){t=String(t||'').trim();const m=t.match(/[#?&]b=([^&\s]+)/);return(m?decodeURIComponent(m[1]):t).toUpperCase()}
+
+/* ---------- Estado y base de datos ---------- */
+const S={espacios:{},responsables:{},bienes:{},materiales:{},necesidades:{},config:{},usuarios:{}};
+const COLS=Object.keys(S);
+let ME=null,CUR='inicio',fdb=null,PENDING=null,LOADED=new Set();
+const LSKEY='inventarioQR_local_v1';
+const clean=v=>v==null?null:JSON.parse(JSON.stringify(v));
+
+const DB={
+ mode:'local',data:{},ls:{},
+ on(c,f){(this.ls[c]??=[]).push(f)},
+ emit(c){(this.ls[c]||[]).forEach(f=>f(c));(this.ls['*']||[]).forEach(f=>f(c))},
+ ref(p){return fdb.ref(ROOT+(p?'/'+p:''))},
+ save(){try{localStorage.setItem(LSKEY,JSON.stringify(this.data))}catch(e){toast('El navegador se quedó sin espacio. Exporta un respaldo y considera activar la nube (Firebase).','err')}},
+ start(){
+  if(this.mode==='local'){try{this.data=JSON.parse(localStorage.getItem(LSKEY)||'{}')}catch(e){this.data={}}COLS.forEach(c=>{S[c]=this.data[c]||{};LOADED.add(c);this.emit(c)})}
+  else COLS.forEach(c=>this.ref(c).on('value',sn=>{S[c]=sn.val()||{};LOADED.add(c);this.emit(c)},e=>{console.warn(c,e);if(c!=='usuarios')toast('Sin permiso para leer '+c+'. Revisa las reglas de Firebase.','err')}));
+ },
+ stop(){if(this.mode!=='local'&&fdb)COLS.forEach(c=>this.ref(c).off())},
+ _lset(p,v){const k=p.split('/');let o=this.data;for(let i=0;i<k.length-1;i++){if(!o[k[i]]||typeof o[k[i]]!=='object')o[k[i]]={};o=o[k[i]]}if(v==null)delete o[k.at(-1)];else o[k.at(-1)]=clean(v)},
+ _lget(p){return p?p.split('/').reduce((o,k)=>o==null?undefined:o[k],this.data):this.data},
+ _touch(paths){this.save();new Set(paths.map(p=>p.split('/')[0])).forEach(c=>{if(c in S)S[c]=this.data[c]||{};this.emit(c)})},
+ async set(p,v){if(this.mode==='local'){this._lset(p,v);this._touch([p])}else await this.ref(p).set(clean(v))},
+ async update(p,o){o=clean(o);if(this.mode==='local'){Object.entries(o).forEach(([k,v])=>this._lset(p+'/'+k,v));this._touch([p])}else await this.ref(p).update(o)},
+ async multi(o){o=clean(o);if(this.mode==='local'){Object.entries(o).forEach(([k,v])=>this._lset(k,v));this._touch(Object.keys(o))}else await this.ref('').update(o)},
+ remove(p){return this.set(p,null)},
+ async get(p){if(this.mode==='local')return clean(this._lget(p)??null);return(await this.ref(p).once('value')).val()},
+ async push(p,v){const id=this.mode==='local'?uid():this.ref(p).push().key;await this.set(p+'/'+id,v);return id},
+ async reserve(p,n){if(this.mode==='local'){const c=this._lget(p)||0;this._lset(p,c+n);this.save();return c+1}const r=await this.ref(p).transaction(c=>(c||0)+n);return r.snapshot.val()-n+1}
+};
+
+function cfg(){const c=S.config||{};return{escuela:'Escuela Secundaria General "21 de Noviembre"',escCorto:'Sec. Gral. 21 de Noviembre',cct:'',direccion:'Esquipulas, Santa Cruz Xoxocotlán, Oaxaca',ciclo:'2026-2027',prefijo:'BM',urlBase:/^https?:/.test(location.href)?location.origin+location.pathname:'',qrModo:'url',contraloria:'',recibeNombre:'Profr. Melchor Sánchez Monjaraz',recibeCargo:'Subdirector Encargado',voboNombre:'Profr. Juan Gabriel Armas Castillo',voboCargo:'Subdirector del Turno Mixto',etiqTam:'M',...c,categorias:(c.categorias&&c.categorias.length)?c.categorias:CATS_DEF}}
+
+/* ---------- Permisos ---------- */
+const isAdmin=()=>ME?.rol==='admin';
+const seeAll=()=>ME&&(ME.rol==='admin'||ME.rol==='consulta');
+const canEdit=()=>ME&&ME.rol!=='consulta';
+const myR=()=>ME?.responsableId||'__none__';
+const mineB=b=>seeAll()||b.responsableId===myR()||(!b.responsableId&&S.espacios[b.espacioId]?.responsableId===myR());
+const mineE=e=>seeAll()||e.responsableId===myR();
+const canEditB=b=>isAdmin()||(canEdit()&&mineB(b));
+const L=(col,key='id')=>Object.entries(S[col]||{}).map(([k,v])=>({...v,[key]:k}));
+const BIENES=()=>L('bienes','codigo').filter(mineB).sort((a,b)=>ncmp(a.codigo,b.codigo));
+const ESPACIOS=()=>L('espacios').filter(mineE).sort((a,b)=>ncmp(a.nombre,b.nombre));
+const MATS=()=>L('materiales').filter(mineB).sort((a,b)=>ncmp(a.nombre,b.nombre));
+const NECS=()=>L('necesidades').filter(n=>seeAll()||S.espacios[n.espacioId]?.responsableId===myR()||n.reportoUid===ME.uid).sort((a,b)=>(NEC_ESTADOS.indexOf(a.estado)-NEC_ESTADOS.indexOf(b.estado))||(PRIORIDADES.indexOf(a.prioridad)-PRIORIDADES.indexOf(b.prioridad))||((b.fecha||0)-(a.fecha||0)));
+const RESPS=()=>L('responsables').sort((a,b)=>ncmp(a.nombre,b.nombre));
+const espName=id=>S.espacios[id]?.nombre||'Sin asignar';
+const respName=id=>S.responsables[id]?.nombre||'Sin asignar';
+const espOpts=(sel,blank='— Sin asignar —')=>opts(L('espacios').sort((a,b)=>ncmp(a.nombre,b.nombre)).map(e=>[e.id,e.nombre]),sel,blank);
+const respOpts=(sel,blank='— Sin asignar —')=>opts(RESPS().map(r=>[r.id,r.nombre]),sel,blank);
+const mkCode=n=>`${(cfg().prefijo||'BM').replace(/[^A-Za-z0-9]/g,'').toUpperCase()||'BM'}-${String(n).padStart(4,'0')}`;
+const pendNec=()=>NECS().filter(n=>n.estado!=='Atendida').length;
+
+/* ---------- Modales ---------- */
+function openModal({title,body,wide,actions=[]}){
+ const m=document.createElement('div');m.className='modal-bg';
+ m.innerHTML=`<div class="modal ${wide?'wide':''}" role="dialog"><div class="mh"><h3>${esc(title)}</h3><button class="icon-btn" data-x aria-label="Cerrar">${ic('x',20)}</button></div><div class="mb">${body}</div><div class="mf"></div></div>`;
+ actions.forEach(a=>{const b=document.createElement('button');b.type='button';b.className='btn '+(a.cls||'');b.innerHTML=a.label;b.onclick=async()=>{if(a.close){closeModal(m);return}b.disabled=true;try{await a.fn(m,b)}catch(e){console.error(e);toast('Error: '+(e.message||e),'err')}finally{b.disabled=false}};$('.mf',m).append(b)});
+ if(!actions.length)$('.mf',m).remove();
+ $('[data-x]',m).onclick=()=>closeModal(m);
+ $('#modalRoot').append(m);
+ setTimeout(()=>{const f=$('input:not([type=hidden]):not([readonly]),select,textarea',$('.mb',m));if(f&&matchMedia('(min-width:900px)').matches)f.focus()},50);
+ return m;
+}
+function closeModal(m){(m||$('#modalRoot .modal-bg:last-child'))?.remove()}
+function confirmDlg(msg,ok='Aceptar',cls='pri'){return new Promise(res=>{const m=openModal({title:'Confirmar',body:`<p style="margin:0">${msg}</p>`,actions:[{label:'Cancelar',fn:()=>{closeModal(m);res(false)}},{label:ok,cls,fn:()=>{closeModal(m);res(true)}}]});$('[data-x]',m).onclick=()=>{closeModal(m);res(false)}})}
+const CANCEL={label:'Cancelar',close:true};
+
+/* ---------- Navegación ---------- */
+const VIEWS={
+ inicio:{t:'Inicio',i:'home',r:vInicio},
+ bienes:{t:'Bienes muebles',i:'box',r:vBienes},
+ espacios:{t:'Espacios',i:'pin',r:vEspacios},
+ materiales:{t:'Materiales',i:'layers',r:vMateriales},
+ necesidades:{t:'Necesidades',i:'alert',r:vNecesidades},
+ responsables:{t:'Responsables',i:'users',r:vResponsables,need:seeAll},
+ etiquetas:{t:'Etiquetas QR',i:'qr',r:vEtiquetas,need:canEdit},
+ escanear:{t:'Escanear QR',i:'scan',r:vEscanear},
+ informes:{t:'Informes',i:'file',r:vInformes},
+ config:{t:'Configuración',i:'gear',r:vConfig,need:isAdmin}
+};
+function buildNav(){
+ $('#nav').innerHTML=Object.entries(VIEWS).filter(([k,v])=>!v.need||v.need()).map(([k,v])=>`<button data-v="${k}" class="${k===CUR?'on':''}">${ic(v.i)}<span>${v.t}</span>${k==='necesidades'?'<span class="bdg" id="bdgNec" hidden></span>':''}</button>`).join('');
+ $$('#nav button').forEach(b=>b.onclick=()=>go(b.dataset.v));
+ badges();
+}
+function badges(){const b=$('#bdgNec');if(!b)return;const n=pendNec();b.hidden=!n;b.textContent=n}
+function go(v){
+ if(!VIEWS[v]||(VIEWS[v].need&&!VIEWS[v].need()))v='inicio';
+ stopScanner();CUR=v;try{localStorage.setItem('invqr_view',v)}catch(e){}
+ $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+ $('#title').textContent=VIEWS[v].t;document.body.classList.remove('nav-open');
+ VIEWS[v].refresh=null;$('#view').innerHTML='';VIEWS[v].r();window.scrollTo(0,0);
+}
+const onData=debounce(()=>{badges();if(!ME)return;const V=VIEWS[CUR];if($('#modalRoot .modal-bg')&&!V.refresh)return;(V.refresh||V.r)()},120);
+
+/* =====================================================================
+   VISTA: INICIO
+   ===================================================================== */
+function vInicio(){
+ const draw=()=>{
+  const B=BIENES().filter(b=>b.situacion!=='Baja'),E=ESPACIOS(),M=MATS(),N=NECS().filter(n=>n.estado!=='Atendida');
+  const c=k=>B.filter(b=>b.situacion===k).length;
+  const malos=B.filter(b=>b.estado==='Malo').length;
+  const d30=Date.now()-30*864e5,ver=B.filter(b=>(b.ultimaVerif||0)>d30).length,pct=B.length?Math.round(ver*100/B.length):0;
+  const byE={};B.forEach(b=>{const k=b.espacioId||'';byE[k]=(byE[k]||0)+1});
+  const topE=Object.entries(byE).sort((a,b)=>b[1]-a[1]).slice(0,8),mx=Math.max(1,...topE.map(x=>x[1]));
+  const byC={};B.forEach(b=>{const k=b.categoria||'Sin categoría';byC[k]=(byC[k]||0)+1});
+  const topC=Object.entries(byC).sort((a,b)=>b[1]-a[1]).slice(0,8),mc=Math.max(1,...topC.map(x=>x[1]));
+  const bars=(arr,m,lab)=>arr.length?arr.map(([k,v])=>`<div class="br"><span title="${esc(lab(k))}">${esc(lab(k))}</span><div class="bt"><i style="width:${v*100/m}%"></i></div><b>${v}</b></div>`).join(''):'<div class="muted">Sin datos todavía.</div>';
+  const urg=N.filter(n=>n.prioridad==='Alta').slice(0,5);
+  const c0=cfg();
+  $('#view').innerHTML=`
+  <div class="welcome"><div><h3>Hola, ${esc((ME.nombre||'').split(' ')[0]||'bienvenido')}</h3><p>${esc(c0.escuela)} · Ciclo ${esc(c0.ciclo)}${seeAll()?'':' · Vista de tu resguardo'}</p></div>
+   <button class="btn gold" onclick="go('escanear')">${ic('scan')} Escanear QR</button></div>
+  <div class="kpis">
+   <div class="kpi" data-go="bienes"><div class="v">${B.length}</div><div class="l">Bienes registrados</div></div>
+   <div class="kpi g" data-go="bienes" data-sit="En uso"><div class="v">${c('En uso')}</div><div class="l">En uso</div></div>
+   <div class="kpi a" data-go="bienes" data-sit="En reparación"><div class="v">${c('En reparación')}</div><div class="l">En reparación</div></div>
+   <div class="kpi r" data-go="bienes" data-sit="Dañado"><div class="v">${c('Dañado')}</div><div class="l">Dañados</div></div>
+   <div class="kpi p" data-go="bienes" data-sit="Faltante"><div class="v">${c('Faltante')}</div><div class="l">Faltantes</div></div>
+   <div class="kpi r" data-go="bienes" data-est="Malo"><div class="v">${malos}</div><div class="l">En mal estado</div></div>
+   <div class="kpi" data-go="espacios"><div class="v">${E.length}</div><div class="l">Espacios</div></div>
+   <div class="kpi" data-go="materiales"><div class="v">${M.length}</div><div class="l">Materiales</div></div>
+   <div class="kpi r" data-go="necesidades"><div class="v">${N.length}</div><div class="l">Necesidades pendientes</div></div>
+  </div>
+  <div class="grid2">
+   <div class="card"><b>Verificación física (últimos 30 días)</b><div class="prog"><i style="width:${pct}%"></i></div><span class="muted">${ver} de ${B.length} bienes verificados con QR (${pct}%)</span>
+    <div style="margin-top:10px"><button class="btn sm" onclick="go('escanear');setTimeout(()=>{const s=$('#scMode');if(s){s.value='verificar';s.onchange()}},50)">${ic('check',15)} Iniciar levantamiento</button></div></div>
+   <div class="card"><b>Necesidades urgentes</b>${urg.length?urg.map(n=>`<div style="padding:7px 0;border-bottom:1px solid #EEF1F6;font-size:14px">${pill(n.tipo,{})} ${esc(n.descripcion)} <span class="muted">· ${esc(espName(n.espacioId))}</span></div>`).join(''):'<div class="muted" style="margin-top:8px">No hay necesidades de prioridad alta pendientes.</div>'}</div>
+   <div class="card bars"><b>Bienes por espacio</b><div style="margin-top:8px">${bars(topE,mx,k=>k?espName(k):'Sin espacio')}</div></div>
+   <div class="card bars"><b>Bienes por categoría</b><div style="margin-top:8px">${bars(topC,mc,k=>k)}</div></div>
+  </div>`;
+  $$('.kpi').forEach(k=>k.onclick=()=>{Object.assign(BF,{q:'',esp:'',resp:'',sit:k.dataset.sit||'',cat:'',est:k.dataset.est||''});go(k.dataset.go)});
+ };
+ draw();VIEWS.inicio.refresh=draw;
+}
+
+/* =====================================================================
+   VISTA: BIENES
+   ===================================================================== */
+const BF={q:'',esp:'',resp:'',sit:'',cat:'',est:''};
+const SEL=new Set();let BLIM=150;
+function filtB(){const q=norm(BF.q);return BIENES().filter(b=>(!BF.esp||(BF.esp==='__none'?!b.espacioId:b.espacioId===BF.esp))&&(!BF.resp||b.responsableId===BF.resp)&&(!BF.sit||b.situacion===BF.sit)&&(!BF.cat||b.categoria===BF.cat)&&(!BF.est||b.estado===BF.est)&&(!q||norm([b.codigo,b.descripcion,b.marca,b.modelo,b.serie,b.inventario,espName(b.espacioId),respName(b.responsableId),b.observaciones].join(' ')).includes(q)))}
+function vBienes(){
+ const c=cfg();BLIM=150;
+ $('#view').innerHTML=`
+ <div class="toolbar">
+  <div class="grow">${ic('search',16)}<input id="bq" placeholder="Buscar por código, descripción, marca, serie…" value="${esc(BF.q)}"></div>
+  <select id="fEsp"><option value="">Todos los espacios</option><option value="__none"${BF.esp==='__none'?' selected':''}>Sin espacio</option>${espOpts(BF.esp,undefined).replace(/^<option value="">.*?<\/option>/,'')}</select>
+  ${seeAll()?`<select id="fResp">${respOpts(BF.resp,'Todos los responsables')}</select>`:''}
+  <select id="fSit">${opts(SITUACIONES,BF.sit,'Toda situación')}</select>
+  <select id="fEst">${opts(ESTADOS,BF.est,'Todo estado')}</select>
+  <select id="fCat">${opts(c.categorias,BF.cat,'Toda categoría')}</select>
+ </div>
+ <div class="toolbar">
+  ${isAdmin()?`<button class="btn pri" id="bAdd">${ic('plus')} Alta de bienes</button>`:''}
+  <button class="btn" id="bCsv">${ic('download')} Exportar a Excel (CSV)</button>
+  <span class="sp"></span><span class="muted" id="bCount"></span>
+ </div>
+ <div id="selbar"></div>
+ <div id="bList"></div>`;
+ const rf=debounce(()=>{BLIM=150;list()},150);
+ $('#bq').oninput=e=>{BF.q=e.target.value;rf()};
+ [['fEsp','esp'],['fResp','resp'],['fSit','sit'],['fEst','est'],['fCat','cat']].forEach(([id,k])=>{const el=$('#'+id);if(el)el.onchange=()=>{BF[k]=el.value;BLIM=150;list()}});
+ if($('#bAdd'))$('#bAdd').onclick=()=>bienForm();
+ $('#bCsv').onclick=()=>csvBienes(filtB());
+ const list=()=>{
+  const R=filtB();$('#bCount').textContent=`${R.length} bien${R.length===1?'':'es'}`;
+  [...SEL].forEach(k=>{if(!S.bienes[k])SEL.delete(k)});
+  $('#selbar').innerHTML=SEL.size?`<div class="selbar"><b>${SEL.size} seleccionado${SEL.size===1?'':'s'}</b>
+   ${canEdit()?`<button class="btn sm" id="sPrint">${ic('qr',15)} Imprimir etiquetas</button>`:''}
+   ${isAdmin()?`<button class="btn sm" id="sMove">${ic('pin',15)} Cambiar espacio / resguardo</button><button class="btn sm" id="sState">${ic('edit',15)} Cambiar estado</button>`:''}
+   <button class="btn sm" id="sClr">Quitar selección</button></div>`:'';
+  if(SEL.size){$('#sClr').onclick=()=>{SEL.clear();list()};if($('#sPrint'))$('#sPrint').onclick=()=>{ET.src='sel';go('etiquetas')};if($('#sMove'))$('#sMove').onclick=()=>massMove();if($('#sState'))$('#sState').onclick=()=>massState()}
+  if(!R.length){$('#bList').innerHTML=`<div class="card empty">${ic('box',42)}<div>${BIENES().length?'Ningún bien coincide con los filtros.':'Aún no hay bienes registrados.'}</div>${isAdmin()&&!BIENES().length?`<p><button class="btn pri" onclick="bienForm()">${ic('plus')} Registrar el primero</button></p>`:''}</div>`;return}
+  const V=R.slice(0,BLIM),all=R.every(b=>SEL.has(b.codigo));
+  $('#bList').innerHTML=`<div class="tw"><table class="rt"><thead><tr><th style="width:34px"><input type="checkbox" id="ckAll" ${all?'checked':''} title="Seleccionar todos los filtrados"></th><th>Código</th><th>Descripción</th><th>Categoría</th><th>Espacio</th><th>Responsable</th><th>Estado</th><th>Situación</th><th>Verificado</th></tr></thead><tbody>
+  ${V.map(b=>`<tr class="ck" data-c="${esc(b.codigo)}"><td data-l=""><input type="checkbox" class="ckb" ${SEL.has(b.codigo)?'checked':''}></td><td data-l="Código" class="code">${esc(b.codigo)}</td><td data-l="Descripción"><div>${esc(b.descripcion)}</div><div class="sub">${esc([b.marca,b.modelo].filter(Boolean).join(' · '))}</div></td><td data-l="Categoría">${esc(b.categoria||'—')}</td><td data-l="Espacio">${esc(espName(b.espacioId))}</td><td data-l="Responsable">${esc(respName(b.responsableId))}</td><td data-l="Estado">${pill(b.estado,PE)}${b.funciona==='No'?' '+pill('No funciona',{"No funciona":'r'}):''}</td><td data-l="Situación">${pill(b.situacion,PS)}</td><td data-l="Verificado" class="sub">${b.ultimaVerif?fdate(b.ultimaVerif):'—'}</td></tr>`).join('')}
+  </tbody></table></div>${R.length>BLIM?`<div class="more"><button class="btn" id="bMore">Mostrar más (${R.length-BLIM} restantes)</button></div>`:''}`;
+  $('#ckAll').onchange=e=>{R.forEach(b=>e.target.checked?SEL.add(b.codigo):SEL.delete(b.codigo));list()};
+  $$('#bList tr.ck').forEach(tr=>{const c=tr.dataset.c;$('.ckb',tr).onclick=e=>{e.stopPropagation();e.target.checked?SEL.add(c):SEL.delete(c);list()};$('td[data-l=""]',tr).onclick=e=>{if(e.target.tagName!=='INPUT'){const k=$('.ckb',tr);k.click()}e.stopPropagation()};tr.onclick=()=>ficha(c)});
+  if($('#bMore'))$('#bMore').onclick=()=>{BLIM+=300;list()};
+ };
+ list();VIEWS.bienes.refresh=list;
+}
+
+function bienForm(code){
+ const c=cfg(),old=code?S.bienes[code]:null;
+ const b=old?{...old}:{estado:'Bueno',funciona:'Sí',situacion:'En uso',fechaAlta:today(),espacioId:BF.esp&&BF.esp!=='__none'?BF.esp:'',responsableId:''};
+ if(!old&&b.espacioId)b.responsableId=S.espacios[b.espacioId]?.responsableId||'';
+ const cats=[...new Set([...c.categorias,...(b.categoria?[b.categoria]:[])])];
+ const m=openModal({title:code?`Editar ${code}`:'Alta de bienes',wide:true,body:`<form class="fg" id="fb" onsubmit="return false">
+  ${!code?`<label class="c2">Número de piezas iguales<input type="number" name="__cant" min="1" max="300" value="1"><small>Se crea un código QR individual por cada pieza (ej. 30 sillas iguales = 30 códigos y 30 etiquetas).</small></label>`:''}
+  <label class="c2">Descripción del bien *<input name="descripcion" required maxlength="120" value="${esc(b.descripcion)}" placeholder="Ej. Silla de paleta, Computadora de escritorio, Proyector"></label>
+  <label>Categoría<select name="categoria">${opts(cats,b.categoria,'— Elegir —')}</select></label>
+  <label>Fecha de alta<input type="date" name="fechaAlta" value="${esc(b.fechaAlta)}"></label>
+  <label>Marca<input name="marca" value="${esc(b.marca)}"></label>
+  <label>Modelo<input name="modelo" value="${esc(b.modelo)}"></label>
+  <label>No. de serie<input name="serie" value="${esc(b.serie)}"></label>
+  <label>No. de inventario oficial<input name="inventario" value="${esc(b.inventario)}" placeholder="Si tiene número de la SEP/IEEPO"></label>
+  <label>Espacio / ubicación<select name="espacioId">${espOpts(b.espacioId)}</select></label>
+  <label>Responsable (resguardo)<select name="responsableId">${respOpts(b.responsableId)}</select></label>
+  <label>Estado físico<select name="estado">${opts(ESTADOS,b.estado)}</select></label>
+  <label>¿Funciona?<select name="funciona">${opts(FUNCIONA,b.funciona)}</select></label>
+  <label>Situación<select name="situacion">${opts(SITUACIONES,b.situacion)}</select></label>
+  <label>Valor aproximado ($)<input type="number" step="0.01" min="0" name="valor" value="${esc(b.valor)}"></label>
+  <label class="c2">Observaciones<textarea name="observaciones" rows="2">${esc(b.observaciones)}</textarea></label>
+  <label class="c2">Fotografía (opcional)<input type="file" accept="image/*" capture="environment" name="__foto"><small>${code?'Si subes una nueva, reemplaza la anterior.':'Solo se guarda cuando das de alta una sola pieza.'}</small></label>
+ </form>`,actions:[CANCEL,{label:ic('check')+' Guardar',cls:'pri',fn:async(m)=>{
+  const f=$('#fb',m);if(!f.reportValidity())return;const d=readForm(f);
+  const file=$('[name=__foto]',f).files[0];const foto=file?await compressImg(file):null;
+  if(code){
+   await DB.update('bienes/'+code,{...d,modificado:Date.now(),modificadoPor:ME.nombre});
+   if(foto)await DB.set('fotos/'+code,foto);
+   await logChanges(code,old,d);closeModal(m);toast('Cambios guardados','ok');
+  }else{
+   const n=Math.max(1,Math.min(300,parseInt($('[name=__cant]',f).value)||1));
+   const st=await DB.reserve('counters/bien',n),codes=[],up={},t=Date.now();
+   for(let i=0;i<n;i++){const k=mkCode(st+i);codes.push(k);up['bienes/'+k]={...d,creado:t,creadoPor:ME.nombre};up[`movimientos/${k}/${uid()}`]={t,u:ME.nombre,tipo:'Alta',det:`Espacio: ${espName(d.espacioId)} · Resguardo: ${respName(d.responsableId)}`}}
+   if(foto&&n===1)up['fotos/'+codes[0]]=foto;
+   await DB.multi(up);closeModal(m);
+   toast(n===1?`Registrado ${codes[0]}`:`Registrados ${n} bienes (${codes[0]} a ${codes.at(-1)})`,'ok');
+   if(await confirmDlg(`¿Imprimir ${n===1?'la etiqueta QR':'las '+n+' etiquetas QR'} ahora?`,'Imprimir')){SEL.clear();codes.forEach(k=>SEL.add(k));ET.src='sel';go('etiquetas')}
+  }
+ }}]});
+ const fe=$('[name=espacioId]',m),fr=$('[name=responsableId]',m);
+ fe.onchange=()=>{const r=S.espacios[fe.value]?.responsableId;if(r)fr.value=r};
+}
+
+async function logChanges(code,o,d,extra=''){
+ const t=Date.now(),u=ME.nombre,up={},add=(tipo,det)=>up[`movimientos/${code}/${uid()}`]={t,u,tipo,det};
+ if((o.espacioId||'')!==(d.espacioId??o.espacioId??''))add('Traslado',`${espName(o.espacioId)} → ${espName(d.espacioId)}`);
+ if((o.responsableId||'')!==(d.responsableId??o.responsableId??''))add('Cambio de resguardo',`${respName(o.responsableId)} → ${respName(d.responsableId)}`);
+ const ch=['estado','funciona','situacion'].filter(k=>k in d&&(o[k]||'')!==(d[k]||'')).map(k=>`${k==='funciona'?'Funciona':k[0].toUpperCase()+k.slice(1)}: ${o[k]||'—'} → ${d[k]||'—'}`);
+ if(ch.length)add('Cambio de estado',ch.join(' · ')+(extra?` · ${extra}`:''));
+ const other=['descripcion','categoria','marca','modelo','serie','inventario','valor','observaciones','fechaAlta'].some(k=>k in d&&String(o[k]??'')!==String(d[k]??''));
+ if(other&&!ch.length)add('Edición de datos',extra||'Se actualizaron datos del bien');
+ if(Object.keys(up).length)await DB.multi(up);
+}
+
+async function ficha(code){
+ code=String(code||'').toUpperCase();const b=S.bienes[code];
+ if(!b){beep(false);toast(`El código ${code} no está registrado`,'err');return}
+ if(!mineB(b)){toast('Este bien no está bajo tu resguardo','err');return}
+ const can=canEditB(b),c=cfg();
+ const acts=[];
+ if(canEdit())acts.push({label:ic('qr')+' Etiqueta',fn:()=>printLabels([code],c.etiqTam)});
+ if(can)acts.push({label:ic('check')+' Verificar',fn:async(m)=>{await verificar(code);closeModal(m);ficha(code)}});
+ if(isAdmin())acts.push({label:ic('trash')+' Eliminar',cls:'dan',fn:async(m)=>{if(await confirmDlg(`¿Eliminar definitivamente <b>${esc(code)}</b>? Si el bien se dio de baja, mejor cambia su situación a "Baja" para conservar el historial.`,'Eliminar','dan')){await DB.multi({['bienes/'+code]:null,['fotos/'+code]:null,['movimientos/'+code]:null});SEL.delete(code);closeModal(m);toast('Bien eliminado')}}});
+ if(isAdmin())acts.push({label:ic('edit')+' Editar',cls:'pri',fn:(m)=>{closeModal(m);bienForm(code)}});
+ else if(can)acts.push({label:ic('edit')+' Actualizar estado',cls:'pri',fn:(m)=>{closeModal(m);quickState(code)}});
+ const m=openModal({title:'Ficha del bien',wide:true,body:`<div class="ficha"><div class="fq">${qrSVG(qrContent(code))}<div class="fcode">${esc(code)}</div><div id="fFoto"></div></div>
+  <div class="fd"><h2>${esc(b.descripcion)}</h2><div class="pills">${pill(b.estado,PE)} ${pill(b.situacion,PS)} ${b.funciona?pill('Funciona: '+b.funciona,{'Funciona: Sí':'g','Funciona: No':'r'}):''}</div>
+  <dl><dt>Espacio</dt><dd>${esc(espName(b.espacioId))}${S.espacios[b.espacioId]?.ubicacion?` <span class="muted">· ${esc(S.espacios[b.espacioId].ubicacion)}</span>`:''}</dd>
+  <dt>Responsable</dt><dd>${esc(respName(b.responsableId))}</dd>
+  <dt>Categoría</dt><dd>${esc(b.categoria||'—')}</dd>
+  ${b.marca||b.modelo?`<dt>Marca / modelo</dt><dd>${esc([b.marca,b.modelo].filter(Boolean).join(' · '))}</dd>`:''}
+  ${b.serie?`<dt>No. de serie</dt><dd>${esc(b.serie)}</dd>`:''}
+  ${b.inventario?`<dt>Inventario oficial</dt><dd>${esc(b.inventario)}</dd>`:''}
+  <dt>Fecha de alta</dt><dd>${b.fechaAlta?esc(b.fechaAlta.split('-').reverse().join('/')):'—'}</dd>
+  ${b.valor!==''&&b.valor!=null?`<dt>Valor aprox.</dt><dd>$${Number(b.valor).toLocaleString('es-MX',{minimumFractionDigits:2})}</dd>`:''}
+  <dt>Última verificación</dt><dd>${b.ultimaVerif?fdt(b.ultimaVerif)+' · '+esc(b.verifPor||''):'Nunca'}</dd>
+  ${b.observaciones?`<dt>Observaciones</dt><dd>${esc(b.observaciones)}</dd>`:''}</dl></div></div>
+  <h3 class="sec">${ic('file',16)} Historial de movimientos</h3><div class="hist" id="fHist"><span class="muted">Cargando…</span></div>`,actions:[...acts,{label:'Cerrar',close:true}]});
+ DB.get('fotos/'+code).then(f=>{if(f&&$('#fFoto',m))$('#fFoto',m).innerHTML=`<img src="${f}" alt="Foto">`}).catch(()=>{});
+ DB.get('movimientos/'+code).then(h=>{const el=$('#fHist',m);if(!el)return;const a=Object.values(h||{}).sort((x,y)=>y.t-x.t);el.innerHTML=a.length?a.map(x=>`<div><time>${fdt(x.t)}</time><span><b>${esc(x.tipo)}</b> — ${esc(x.det||'')} <span class="muted">(${esc(x.u||'')})</span></span></div>`).join(''):'<span class="muted">Sin movimientos registrados.</span>'}).catch(()=>{});
+}
+
+async function verificar(code,extra){
+ const b=S.bienes[code];if(!b)return false;
+ await DB.update('bienes/'+code,{ultimaVerif:Date.now(),verifPor:ME.nombre});
+ await DB.push('movimientos/'+code,{t:Date.now(),u:ME.nombre,tipo:'Verificación física',det:extra||`Encontrado en ${espName(b.espacioId)}`});
+ return true;
+}
+
+function quickState(code){
+ const b=S.bienes[code];
+ const m=openModal({title:'Actualizar estado · '+code,body:`<form class="fg" id="fq" onsubmit="return false">
+  <label>Estado físico<select name="estado">${opts(ESTADOS,b.estado)}</select></label>
+  <label>¿Funciona?<select name="funciona">${opts(FUNCIONA,b.funciona)}</select></label>
+  <label class="c2">Situación<select name="situacion">${opts(SITUACIONES.filter(s=>s!=='Baja'||b.situacion==='Baja'),b.situacion)}</select></label>
+  <label class="c2">Observaciones<textarea name="observaciones" rows="3">${esc(b.observaciones)}</textarea></label></form>`,
+  actions:[CANCEL,{label:ic('check')+' Guardar',cls:'pri',fn:async(m)=>{const d=readForm($('#fq',m));await DB.update('bienes/'+code,{...d,modificado:Date.now(),modificadoPor:ME.nombre});await logChanges(code,b,d);closeModal(m);toast('Estado actualizado','ok');ficha(code)}}]});
+}
+
+function massMove(){
+ const n=SEL.size;
+ const m=openModal({title:`Cambiar espacio / resguardo (${n})`,body:`<form class="fg" id="fm" onsubmit="return false">
+  <label class="c2">Nuevo espacio<select name="espacioId"><option value="__keep">— No cambiar —</option>${espOpts('', '— Sin asignar —')}</select></label>
+  <label class="c2">Nuevo responsable<select name="responsableId"><option value="__keep">— No cambiar —</option>${respOpts('','— Sin asignar —')}</select><small>Al elegir un espacio se propone su responsable.</small></label></form>`,
+  actions:[CANCEL,{label:'Aplicar',cls:'pri',fn:async(m)=>{const d=readForm($('#fm',m));const up={},t=Date.now();
+   for(const k of SEL){const o=S.bienes[k];if(!o)continue;const nd={};if(d.espacioId!=='__keep')nd.espacioId=d.espacioId;if(d.responsableId!=='__keep')nd.responsableId=d.responsableId;
+    Object.entries(nd).forEach(([f,v])=>up[`bienes/${k}/${f}`]=v);
+    if('espacioId' in nd&&(o.espacioId||'')!==nd.espacioId)up[`movimientos/${k}/${uid()}`]={t,u:ME.nombre,tipo:'Traslado',det:`${espName(o.espacioId)} → ${espName(nd.espacioId)}`};
+    if('responsableId' in nd&&(o.responsableId||'')!==nd.responsableId)up[`movimientos/${k}/${uid()}`]={t,u:ME.nombre,tipo:'Cambio de resguardo',det:`${respName(o.responsableId)} → ${respName(nd.responsableId)}`}}
+   await DB.multi(up);closeModal(m);toast(`${n} bienes actualizados`,'ok')}}]});
+ const fe=$('[name=espacioId]',m),fr=$('[name=responsableId]',m);fe.onchange=()=>{const r=S.espacios[fe.value]?.responsableId;if(r)fr.value=r};
+}
+function massState(){
+ const n=SEL.size;
+ const m=openModal({title:`Cambiar estado (${n})`,body:`<form class="fg" id="fs" onsubmit="return false">
+  <label>Estado físico<select name="estado"><option value="__keep">— No cambiar —</option>${opts(ESTADOS)}</select></label>
+  <label>¿Funciona?<select name="funciona"><option value="__keep">— No cambiar —</option>${opts(FUNCIONA)}</select></label>
+  <label class="c2">Situación<select name="situacion"><option value="__keep">— No cambiar —</option>${opts(SITUACIONES)}</select></label></form>`,
+  actions:[CANCEL,{label:'Aplicar',cls:'pri',fn:async(m)=>{const d=readForm($('#fs',m));const up={},t=Date.now();
+   for(const k of SEL){const o=S.bienes[k];if(!o)continue;const ch=[];['estado','funciona','situacion'].forEach(f=>{if(d[f]!=='__keep'&&o[f]!==d[f]){up[`bienes/${k}/${f}`]=d[f];ch.push(`${f}: ${o[f]||'—'} → ${d[f]}`)}});if(ch.length)up[`movimientos/${k}/${uid()}`]={t,u:ME.nombre,tipo:'Cambio de estado',det:ch.join(' · ')}}
+   await DB.multi(up);closeModal(m);toast('Estados actualizados','ok')}}]});
+}
+
+/* =====================================================================
+   VISTA: ESPACIOS
+   ===================================================================== */
+let EQ='';
+function vEspacios(){
+ $('#view').innerHTML=`<div class="toolbar"><div class="grow">${ic('search',16)}<input id="eq" placeholder="Buscar espacio, ubicación o responsable…" value="${esc(EQ)}"></div>
+  ${isAdmin()?`<button class="btn pri" id="eAdd">${ic('plus')} Nuevo espacio</button>`:''}</div><div id="eList"></div>`;
+ $('#eq').oninput=debounce(e=>{EQ=$('#eq').value;list()},150);
+ if($('#eAdd'))$('#eAdd').onclick=()=>espForm();
+ const list=()=>{
+  const q=norm(EQ),E=ESPACIOS().filter(e=>!q||norm([e.nombre,e.tipo,e.ubicacion,respName(e.responsableId)].join(' ')).includes(q));
+  const B=L('bienes').filter(b=>b.situacion!=='Baja'),M=L('materiales'),N=L('necesidades').filter(n=>n.estado!=='Atendida');
+  $('#eList').innerHTML=E.length?`<div class="cgrid">${E.map(e=>{
+   const nb=B.filter(b=>b.espacioId===e.id),np=nb.filter(b=>['Dañado','Faltante','En reparación'].includes(b.situacion)||b.estado==='Malo').length;
+   const cond=Object.values(e.condiciones||{}),cm=cond.filter(x=>x.e==='M').length,cr=cond.filter(x=>x.e==='R').length,nn=N.filter(n=>n.espacioId===e.id).length;
+   const can=isAdmin()||(canEdit()&&e.responsableId===myR());
+   return`<div class="ec"><h4>${esc(e.nombre)}</h4><div class="meta"><span>${ic('pin',14)} ${esc([e.tipo,e.ubicacion].filter(Boolean).join(' · ')||'Sin ubicación')}</span><span>${ic('user',14)} ${esc(respName(e.responsableId))}${e.turno?' · '+esc(e.turno):''}</span></div>
+   <div class="stats"><span class="pill n">${nb.length} bienes</span><span class="pill n">${M.filter(x=>x.espacioId===e.id).length} materiales</span>${np?`<span class="pill r">${np} con problema</span>`:''}${cm?`<span class="pill r">${cm} elem. en mal estado</span>`:''}${cr?`<span class="pill a">${cr} regular</span>`:''}${nn?`<span class="pill a">${nn} necesidades</span>`:''}</div>
+   <div class="acts"><button class="btn sm" data-a="bienes" data-id="${e.id}">${ic('box',15)} Bienes</button>${can?`<button class="btn sm" data-a="edit" data-id="${e.id}">${ic('edit',15)} ${isAdmin()?'Editar':'Condiciones'}</button>`:`<button class="btn sm" data-a="ver" data-id="${e.id}">Ver condiciones</button>`}${canEdit()?`<button class="btn sm" data-a="nec" data-id="${e.id}">${ic('alert',15)} Necesidad</button>`:''}</div></div>`}).join('')}</div>`
+  :`<div class="card empty">${ic('pin',42)}<div>${ESPACIOS().length?'Sin resultados.':(seeAll()?'Registra los espacios de la escuela: aulas, laboratorios, oficinas, bodegas…':'No tienes espacios asignados.')}</div></div>`;
+  $$('#eList [data-a]').forEach(b=>b.onclick=()=>{const id=b.dataset.id;({bienes:()=>{Object.assign(BF,{q:'',esp:id,resp:'',sit:'',cat:'',est:''});go('bienes')},edit:()=>espForm(id),ver:()=>espForm(id,true),nec:()=>necForm(null,id)})[b.dataset.a]()});
+ };
+ list();VIEWS.espacios.refresh=list;
+}
+function espForm(id,ro){
+ const e=id?{...S.espacios[id]}:{tipo:'Aula',condiciones:{}};const adm=isAdmin()&&!ro;const cond=e.condiciones||{};
+ const els=[...ELEMENTOS,...Object.keys(cond).filter(k=>!ELEMENTOS.includes(k))];
+ const m=openModal({title:id?(ro?e.nombre:'Editar espacio'):'Nuevo espacio',wide:true,body:`<form id="fe" onsubmit="return false"><div class="fg">
+  <label class="c2">Nombre del espacio *<input name="nombre" required value="${esc(e.nombre)}" ${adm?'':'readonly'} placeholder="Ej. Aula 3°A, Laboratorio de Ciencias, Dirección"></label>
+  <label>Tipo<select name="tipo" ${adm?'':'disabled'}>${opts(TIPOS_ESP,e.tipo)}</select></label>
+  <label>Ubicación (edificio, planta, referencia)<input name="ubicacion" value="${esc(e.ubicacion)}" ${adm?'':'readonly'}></label>
+  <label>Responsable<select name="responsableId" ${adm?'':'disabled'}>${respOpts(e.responsableId)}</select></label>
+  <label>Turno<select name="turno" ${adm?'':'disabled'}>${opts(['Matutino','Mixto','Ambos'],e.turno,'—')}</select></label></div>
+  <h3 class="sec">Condiciones físicas actuales</h3><div class="muted" style="font-size:13px;margin-bottom:6px">B = Bueno · R = Regular · M = Malo. Deja sin marcar lo que no aplique.</div>
+  <div style="overflow:auto"><table class="ctab"><thead><tr><th>Elemento</th><th>Estado</th><th>Descripción</th></tr></thead><tbody>
+  ${els.map((k,i)=>`<tr data-k="${esc(k)}"><td>${esc(k)}</td><td><div class="rg">${['B','R','M'].map(v=>`<label><input type="radio" name="__c${i}" value="${v}" ${cond[k]?.e===v?'checked':''} ${ro?'disabled':''}>${v}</label>`).join('')}</div></td><td><input type="text" value="${esc(cond[k]?.d)}" ${ro?'readonly':''} placeholder="Detalle (opcional)"></td></tr>`).join('')}
+  </tbody></table></div>
+  <label style="margin-top:12px">Observaciones del espacio<textarea name="observaciones" rows="2" ${ro?'readonly':''}>${esc(e.observaciones)}</textarea></label></form>`,
+  actions:ro?[{label:'Cerrar',close:true}]:[
+   ...(id&&isAdmin()?[{label:ic('trash')+' Eliminar',cls:'dan',fn:async(m)=>{const nb=L('bienes').filter(b=>b.espacioId===id).length;if(await confirmDlg(`¿Eliminar el espacio <b>${esc(e.nombre)}</b>?${nb?` Tiene ${nb} bienes que quedarán "Sin espacio".`:''}`,'Eliminar','dan')){await DB.remove('espacios/'+id);closeModal(m);toast('Espacio eliminado')}}}]:[]),
+   CANCEL,{label:ic('check')+' Guardar',cls:'pri',fn:async(m)=>{const f=$('#fe',m);if(!f.reportValidity())return;
+    const d=adm?readForm(f):{observaciones:$('[name=observaciones]',f).value.trim()};const cc={};
+    $$('.ctab tbody tr',f).forEach(tr=>{const v=$('input[type=radio]:checked',tr)?.value||'',t=$('input[type=text]',tr).value.trim();if(v||t)cc[tr.dataset.k]={e:v,d:t}});
+    d.condiciones=cc;d.actualizado=Date.now();d.actualizadoPor=ME.nombre;
+    if(id)await DB.update('espacios/'+id,d);else await DB.set('espacios/'+uid(),{...d,creado:Date.now()});
+    closeModal(m);toast('Espacio guardado','ok')}}]});
+}
+
+/* =====================================================================
+   VISTA: MATERIALES
+   ===================================================================== */
+let MQ='',MESP='';
+function vMateriales(){
+ $('#view').innerHTML=`<div class="toolbar"><div class="grow">${ic('search',16)}<input id="mq" placeholder="Buscar material…" value="${esc(MQ)}"></div>
+  <select id="mEsp"><option value="">Todos los espacios</option>${espOpts(MESP,undefined).replace(/^<option value="">.*?<\/option>/,'')}</select>
+  ${canEdit()?`<button class="btn pri" id="mAdd">${ic('plus')} Agregar material</button>`:''}<button class="btn" id="mCsv">${ic('download')} CSV</button></div><div id="mList"></div>`;
+ $('#mq').oninput=debounce(()=>{MQ=$('#mq').value;list()},150);$('#mEsp').onchange=()=>{MESP=$('#mEsp').value;list()};
+ if($('#mAdd'))$('#mAdd').onclick=()=>matForm();
+ const fl=()=>{const q=norm(MQ);return MATS().filter(x=>(!MESP||x.espacioId===MESP)&&(!q||norm([x.nombre,x.observaciones,espName(x.espacioId),respName(x.responsableId)].join(' ')).includes(q)))};
+ $('#mCsv').onclick=()=>csvMats(fl());
+ const list=()=>{const R=fl();
+  $('#mList').innerHTML=R.length?`<div class="tw"><table class="rt"><thead><tr><th>Material</th><th>Cantidad</th><th>Unidad</th><th>Precisión</th><th>Estado</th><th>Espacio</th><th>Responsable</th><th></th></tr></thead><tbody>
+  ${R.map(x=>{const can=isAdmin()||(canEdit()&&mineB(x));return`<tr data-id="${x.id}"><td data-l="Material"><b>${esc(x.nombre)}</b>${x.observaciones?`<div class="sub">${esc(x.observaciones)}</div>`:''}</td>
+  <td data-l="Cantidad"><span class="qty">${can?`<button class="icon-btn" data-q="-1">−</button>`:''}<b>${esc(x.cantidad??0)}</b>${can?`<button class="icon-btn" data-q="1">+</button>`:''}</span></td>
+  <td data-l="Unidad">${esc(x.unidad)}</td><td data-l="Precisión">${esc(x.precision||'Exacta')}</td><td data-l="Estado">${pill(x.estado,PE)}</td><td data-l="Espacio">${esc(espName(x.espacioId))}</td><td data-l="Responsable">${esc(respName(x.responsableId))}</td>
+  <td data-l="">${can?`<button class="icon-btn" data-e title="Editar">${ic('edit',16)}</button>`:''}</td></tr>`}).join('')}</tbody></table></div>`
+  :`<div class="card empty">${ic('layers',42)}<div>Sin materiales registrados${MQ||MESP?' con esos filtros':''}.</div><div class="muted" style="font-size:13px">Ej. plumones, hojas, material de laboratorio, balones, artículos de limpieza.</div></div>`;
+  $$('#mList tr[data-id]').forEach(tr=>{const id=tr.dataset.id;$$('[data-q]',tr).forEach(b=>b.onclick=async()=>{const v=Math.max(0,(Number(S.materiales[id]?.cantidad)||0)+Number(b.dataset.q));await DB.update('materiales/'+id,{cantidad:v,actualizado:Date.now(),actualizadoPor:ME.nombre})});const e=$('[data-e]',tr);if(e)e.onclick=()=>matForm(id)});
+ };
+ list();VIEWS.materiales.refresh=list;
+}
+function matForm(id){
+ const x=id?{...S.materiales[id]}:{unidad:'piezas',precision:'Exacta',estado:'Bueno',cantidad:1,espacioId:MESP||''};
+ if(!id&&x.espacioId)x.responsableId=S.espacios[x.espacioId]?.responsableId||'';
+ if(!id&&!seeAll()){x.responsableId=myR()}
+ const m=openModal({title:id?'Editar material':'Agregar material',body:`<form class="fg" id="fmat" onsubmit="return false">
+  <label class="c2">Material *<input name="nombre" required value="${esc(x.nombre)}" placeholder="Ej. Plumones para pintarrón"></label>
+  <label>Cantidad<input type="number" min="0" step="any" name="cantidad" value="${esc(x.cantidad)}"></label>
+  <label>Unidad<input name="unidad" list="dlUn" value="${esc(x.unidad)}"><datalist id="dlUn">${UNIDADES.map(u=>`<option value="${u}">`).join('')}</datalist></label>
+  <label>Precisión de la cantidad<select name="precision">${opts(['Exacta','Aproximada'],x.precision)}</select></label>
+  <label>Estado<select name="estado">${opts(ESTADOS,x.estado)}</select></label>
+  <label>Espacio<select name="espacioId">${espOpts(x.espacioId)}</select></label>
+  <label>Responsable<select name="responsableId" ${seeAll()?'':'disabled'}>${respOpts(x.responsableId)}</select></label>
+  <label class="c2">Observaciones<textarea name="observaciones" rows="2">${esc(x.observaciones)}</textarea></label></form>`,
+  actions:[...(id&&(isAdmin()||mineB(x))?[{label:ic('trash')+' Eliminar',cls:'dan',fn:async(m)=>{if(await confirmDlg(`¿Eliminar <b>${esc(x.nombre)}</b>?`,'Eliminar','dan')){await DB.remove('materiales/'+id);closeModal(m)}}}]:[]),
+   CANCEL,{label:ic('check')+' Guardar',cls:'pri',fn:async(m)=>{const f=$('#fmat',m);if(!f.reportValidity())return;const d=readForm(f);if(!seeAll())d.responsableId=myR();d.cantidad=d.cantidad===''?0:d.cantidad;d.actualizado=Date.now();d.actualizadoPor=ME.nombre;
+    if(id)await DB.update('materiales/'+id,d);else await DB.set('materiales/'+uid(),d);closeModal(m);toast('Material guardado','ok')}}]});
+ const fe=$('[name=espacioId]',m),fr=$('[name=responsableId]',m);fe.onchange=()=>{const r=S.espacios[fe.value]?.responsableId;if(r&&seeAll())fr.value=r};
+}
+
+/* =====================================================================
+   VISTA: NECESIDADES
+   ===================================================================== */
+const NF={est:'pend',pri:'',esp:''};
+function vNecesidades(){
+ $('#view').innerHTML=`<div class="toolbar">
+  <select id="nEst">${opts([['pend','Pendientes y en proceso'],...NEC_ESTADOS.map(s=>[s,s])],NF.est,'Todas')}</select>
+  <select id="nPri">${opts(PRIORIDADES,NF.pri,'Toda prioridad')}</select>
+  <select id="nEsp"><option value="">Todos los espacios</option>${espOpts(NF.esp,undefined).replace(/^<option value="">.*?<\/option>/,'')}</select>
+  <span class="sp"></span>${canEdit()?`<button class="btn pri" id="nAdd">${ic('plus')} Registrar necesidad</button>`:''}</div><div id="nList"></div>`;
+ [['nEst','est'],['nPri','pri'],['nEsp','esp']].forEach(([i,k])=>$('#'+i).onchange=()=>{NF[k]=$('#'+i).value;list()});
+ if($('#nAdd'))$('#nAdd').onclick=()=>necForm();
+ const list=()=>{const R=NECS().filter(n=>(!NF.est||(NF.est==='pend'?n.estado!=='Atendida':n.estado===NF.est))&&(!NF.pri||n.prioridad===NF.pri)&&(!NF.esp||n.espacioId===NF.esp));
+  $('#nList').innerHTML=R.length?`<div class="cgrid">${R.map(n=>`<div class="ec nc ${esc(n.prioridad)}"><div class="stats">${pill(n.estado,PN)} ${pill('Prioridad '+n.prioridad,{['Prioridad '+n.prioridad]:PP[n.prioridad]})} <span class="pill n">${esc(n.tipo)}</span></div>
+   <p>${esc(n.descripcion)}</p><div class="meta"><span>${ic('pin',14)} ${esc(espName(n.espacioId))}${n.bienCodigo?' · '+esc(n.bienCodigo):''}</span><span>${ic('user',14)} ${esc(n.reporto||'')} · ${fdate(n.fecha)}</span>${n.atencion?`<span>${ic('check',14)} ${esc(n.atencion)}</span>`:''}</div>
+   ${(isAdmin()||n.reportoUid===ME.uid)&&canEdit()?`<div class="acts"><button class="btn sm" data-id="${n.id}">${ic('edit',15)} ${isAdmin()?'Dar seguimiento':'Editar'}</button></div>`:''}</div>`).join('')}</div>`
+  :`<div class="card empty">${ic('alert',42)}<div>No hay necesidades con esos filtros.</div></div>`;
+  $$('#nList [data-id]').forEach(b=>b.onclick=()=>necForm(b.dataset.id));
+ };
+ list();VIEWS.necesidades.refresh=list;
+}
+function necForm(id,espId){
+ const n=id?{...S.necesidades[id]}:{tipo:'Mantenimiento',prioridad:'Media',estado:'Pendiente',espacioId:espId||''};
+ const espList=seeAll()?espOpts(n.espacioId,'— Elegir —'):opts(ESPACIOS().map(e=>[e.id,e.nombre]),n.espacioId,'— Elegir —');
+ const m=openModal({title:id?'Necesidad':'Registrar necesidad',body:`<form class="fg" id="fn" onsubmit="return false">
+  <label class="c2">Espacio *<select name="espacioId" required>${espList}</select></label>
+  <label>Tipo<select name="tipo">${opts(NEC_TIPOS,n.tipo)}</select></label>
+  <label>Prioridad<select name="prioridad">${opts(PRIORIDADES,n.prioridad)}</select></label>
+  <label class="c2">Descripción *<textarea name="descripcion" required rows="3" placeholder="Ej. Contacto eléctrico junto al pizarrón sin tapa; se requiere reemplazo.">${esc(n.descripcion)}</textarea></label>
+  <label class="c2">Código del bien relacionado (opcional)<input name="bienCodigo" value="${esc(n.bienCodigo)}" placeholder="Ej. BM-0012"></label>
+  ${isAdmin()?`<label>Estado<select name="estado">${opts(NEC_ESTADOS,n.estado)}</select></label><label>Acción / seguimiento<input name="atencion" value="${esc(n.atencion)}" placeholder="Ej. Se solicitó al área de mantenimiento"></label>`:''}</form>`,
+  actions:[...(id&&isAdmin()?[{label:ic('trash')+' Eliminar',cls:'dan',fn:async(m)=>{if(await confirmDlg('¿Eliminar esta necesidad?','Eliminar','dan')){await DB.remove('necesidades/'+id);closeModal(m)}}}]:[]),
+   CANCEL,{label:ic('check')+' Guardar',cls:'pri',fn:async(m)=>{const f=$('#fn',m);if(!f.reportValidity())return;const d=readForm(f);d.bienCodigo=(d.bienCodigo||'').toUpperCase();
+    if(id){if(d.estado==='Atendida'&&n.estado!=='Atendida')d.fechaAtendida=Date.now();await DB.update('necesidades/'+id,d)}
+    else await DB.set('necesidades/'+uid(),{estado:'Pendiente',...d,fecha:Date.now(),reporto:ME.nombre,reportoUid:ME.uid||''});
+    closeModal(m);toast('Necesidad guardada','ok')}}]});
+}
+
+/* =====================================================================
+   VISTA: RESPONSABLES
+   ===================================================================== */
+function vResponsables(){
+ $('#view').innerHTML=`<div class="toolbar"><span class="muted">Personal que tiene bajo su resguardo espacios, bienes o materiales (docentes, prefectos, comisiones, administrativos).</span><span class="sp"></span>${isAdmin()?`<button class="btn pri" id="rAdd">${ic('plus')} Nuevo responsable</button>`:''}</div><div id="rList"></div>`;
+ if($('#rAdd'))$('#rAdd').onclick=()=>respForm();
+ const list=()=>{const R=RESPS(),B=L('bienes').filter(b=>b.situacion!=='Baja'),E=L('espacios'),M=L('materiales');
+  $('#rList').innerHTML=R.length?`<div class="tw"><table class="rt"><thead><tr><th>Nombre</th><th>Cargo / función</th><th>Turno</th><th>Espacios</th><th>Bienes</th><th>Materiales</th><th></th></tr></thead><tbody>
+  ${R.map(r=>`<tr data-id="${r.id}"><td data-l="Nombre"><b>${esc(r.nombre)}</b>${r.correo?`<div class="sub">${esc(r.correo)}</div>`:''}</td><td data-l="Cargo">${esc(r.cargo||'—')}${r.area?`<div class="sub">${esc(r.area)}</div>`:''}</td><td data-l="Turno">${esc(r.turno||'—')}</td>
+  <td data-l="Espacios">${E.filter(e=>e.responsableId===r.id).length}</td><td data-l="Bienes">${B.filter(b=>b.responsableId===r.id).length}</td><td data-l="Materiales">${M.filter(x=>x.responsableId===r.id).length}</td>
+  <td data-l=""><button class="btn sm" data-a="inf">${ic('file',15)} Informe</button> ${isAdmin()?`<button class="icon-btn" data-a="ed" title="Editar">${ic('edit',16)}</button>`:''}</td></tr>`).join('')}</tbody></table></div>`
+  :`<div class="card empty">${ic('users',42)}<div>Aún no hay responsables registrados.</div></div>`;
+  $$('#rList tr[data-id]').forEach(tr=>$$('[data-a]',tr).forEach(b=>b.onclick=()=>b.dataset.a==='inf'?informeResp(tr.dataset.id):respForm(tr.dataset.id)));
+ };
+ list();VIEWS.responsables.refresh=list;
+}
+function respForm(id){
+ const r=id?{...S.responsables[id]}:{};
+ const m=openModal({title:id?'Editar responsable':'Nuevo responsable',body:`<form class="fg" id="fr" onsubmit="return false">
+  <label class="c2">Nombre completo *<input name="nombre" required value="${esc(r.nombre)}" placeholder="Ej. Profr. José Emmanuel Chan Ibáñez"></label>
+  <label>Cargo / función<input name="cargo" value="${esc(r.cargo)}" placeholder="Docente, Prefecto, Secretaria…"></label>
+  <label>Turno<select name="turno">${opts(['Matutino','Mixto','Ambos'],r.turno,'—')}</select></label>
+  <label>Comisión o área<input name="area" value="${esc(r.area)}" placeholder="Ej. Sala de cómputo, Comisión de vigilancia"></label>
+  <label>Correo<input type="email" name="correo" value="${esc(r.correo)}"></label></form>`,
+  actions:[...(id?[{label:ic('trash')+' Eliminar',cls:'dan',fn:async(m)=>{if(await confirmDlg(`¿Eliminar a <b>${esc(r.nombre)}</b>? Sus bienes y espacios quedarán "Sin asignar".`,'Eliminar','dan')){await DB.remove('responsables/'+id);closeModal(m)}}}]:[]),
+   CANCEL,{label:ic('check')+' Guardar',cls:'pri',fn:async(m)=>{const f=$('#fr',m);if(!f.reportValidity())return;const d=readForm(f);if(id)await DB.update('responsables/'+id,d);else await DB.set('responsables/'+uid(),d);closeModal(m);toast('Responsable guardado','ok')}}]});
+}
+
+/* =====================================================================
+   VISTA: ETIQUETAS QR
+   ===================================================================== */
+const ET={src:'sel',esp:'',resp:'',tam:''};
+function etCodes(){
+ const B=BIENES().filter(b=>b.situacion!=='Baja');
+ if(ET.src==='sel')return BIENES().filter(b=>SEL.has(b.codigo)).map(b=>b.codigo);
+ if(ET.src==='esp')return B.filter(b=>b.espacioId===ET.esp).map(b=>b.codigo);
+ if(ET.src==='resp')return B.filter(b=>b.responsableId===ET.resp).map(b=>b.codigo);
+ if(ET.src==='rango')return B.filter(b=>ncmp(b.codigo,ET.desde)>=0&&ncmp(b.codigo,ET.hasta)<=0).map(b=>b.codigo);
+ return B.map(b=>b.codigo);
+}
+function vEtiquetas(){
+ const c=cfg();if(!ET.tam)ET.tam=c.etiqTam||'M';if(ET.src==='sel'&&!SEL.size)ET.src='todos';
+ $('#view').innerHTML=`<div class="card" style="margin-bottom:14px"><div class="fg" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+  <label>¿Qué etiquetas imprimir?<select id="etSrc">${opts([['sel',`Selección de la lista de bienes (${SEL.size})`],['esp','Por espacio'],['resp','Por responsable'],['rango','Por rango de códigos'],['todos','Todos los bienes']],ET.src)}</select></label>
+  <label id="wEsp">Espacio<select id="etEsp">${espOpts(ET.esp,'— Elegir —')}</select></label>
+  <label id="wResp">Responsable<select id="etResp">${respOpts(ET.resp,'— Elegir —')}</select></label>
+  <label id="wDesde">Desde<input id="etDesde" value="${esc(ET.desde||mkCode(1))}"></label>
+  <label id="wHasta">Hasta<input id="etHasta" value="${esc(ET.hasta||mkCode(50))}"></label>
+  <label>Tamaño<select id="etTam">${opts([['S','Chica · 4.5 × 2.5 cm (sillas, mesas)'],['M','Mediana · 6.4 × 3.4 cm'],['L','Grande · 9.2 × 4.6 cm (equipos)']],ET.tam)}</select></label></div>
+  <div class="toolbar" style="margin:14px 0 0"><button class="btn pri" id="etPrint">${ic('print')} Imprimir</button><span class="muted" id="etInfo"></span></div>
+  <div class="muted" style="font-size:12.5px;margin-top:6px">Consejo: imprime en hojas de etiquetas adhesivas tamaño carta o en papel normal y fórralas con cinta transparente. Al imprimir, selecciona escala 100% (tamaño real) y sin encabezados.</div></div>
+  <div class="prev"><div id="etPrev"></div></div>`;
+ const upd=()=>{ET.src=$('#etSrc').value;ET.esp=$('#etEsp').value;ET.resp=$('#etResp').value;ET.tam=$('#etTam').value;ET.desde=$('#etDesde').value.trim().toUpperCase();ET.hasta=$('#etHasta').value.trim().toUpperCase();
+  $('#wEsp').hidden=ET.src!=='esp';$('#wResp').hidden=ET.src!=='resp';$('#wDesde').hidden=$('#wHasta').hidden=ET.src!=='rango';
+  const C=etCodes(),per={S:36,M:21,L:10}[ET.tam];$('#etInfo').textContent=`${C.length} etiqueta${C.length===1?'':'s'} · aprox. ${Math.max(C.length?1:0,Math.ceil(C.length/per))} hoja${Math.ceil(C.length/per)===1?'':'s'} carta`;
+  $('#etPrev').innerHTML=C.length?`<div class="sheet">${C.slice(0,30).map(k=>lblHTML(k,ET.tam)).join('')}</div>${C.length>30?`<p class="muted">Vista previa de las primeras 30. Se imprimirán las ${C.length}.</p>`:''}`:'<div class="empty">No hay bienes para esta opción.</div>'};
+ $$('#view select,#view input').forEach(e=>e.onchange=e.oninput=upd);
+ $('#etPrint').onclick=()=>{const C=etCodes();if(!C.length)return toast('No hay etiquetas para imprimir','err');DB.update('config',{etiqTam:ET.tam}).catch(()=>{});printLabels(C,ET.tam)};
+ upd();VIEWS.etiquetas.refresh=upd;
+}
+function lblHTML(code,tam){const b=S.bienes[code]||{},c=cfg();return`<div class="lbl ${tam}"><div class="lq">${qrSVG(qrContent(code))}</div><div class="lt"><div class="ls">${esc(c.escCorto)}</div><div class="lc">${esc(code)}</div><div class="ld">${esc(b.descripcion||'')}</div><div class="le">${esc(espName(b.espacioId))}</div></div></div>`}
+function printLabels(codes,tam='M'){printHTML(`<div class="sheet">${codes.map(k=>lblHTML(k,tam)).join('')}</div>`,'')}
+function printHTML(html,cls){const pa=$('#printArea');pa.className=cls||'';pa.innerHTML=html;setTimeout(()=>window.print(),250)}
+
+/* =====================================================================
+   VISTA: ESCANEAR
+   ===================================================================== */
+let SCN=null,SCLAST={c:'',t:0},SESS=[];
+function vEscanear(){
+ const adm=isAdmin();
+ $('#view').innerHTML=`<div class="scanw"><div>
+  <div class="card" style="margin-bottom:12px"><div class="fg">
+   <label class="c2">Modo<select id="scMode">${opts([['ver','Ver ficha del bien'],...(canEdit()?[['verificar','Levantamiento: marcar como verificado']]:[]),...(adm?[['asignar','Asignar / trasladar a un espacio']]:[])],'ver')}</select></label>
+   <label class="c2" id="scEspW" hidden>Espacio destino<select id="scEsp">${espOpts('','— Elegir espacio —')}</select><small>Cada bien que escanees se moverá a este espacio y quedará bajo el resguardo de su responsable.</small></label></div></div>
+  <div id="reader"><div style="text-align:center;padding:20px">${ic('camera',44)}<p>La cámara se activa al presionar el botón.</p></div></div>
+  <div class="toolbar" style="margin-top:10px"><button class="btn pri" id="scGo">${ic('camera')} Activar cámara</button><button class="btn" id="scStop" hidden>Detener</button></div>
+  <form class="toolbar" id="scMan"><input id="scCode" placeholder="O escribe el código, ej. BM-0001" style="flex:1"><button class="btn">Buscar</button></form>
+ </div>
+ <div class="card"><div style="display:flex;align-items:center;gap:8px"><b>Escaneados en esta sesión</b><span class="pill n" id="scN">0</span><span class="sp"></span><button class="btn sm" id="scClr">Limpiar</button></div><div class="slist" id="scList"></div></div></div>`;
+ $('#scMode').onchange=()=>{$('#scEspW').hidden=$('#scMode').value!=='asignar'};
+ $('#scGo').onclick=startScanner;$('#scStop').onclick=stopScanner;
+ $('#scMan').onsubmit=e=>{e.preventDefault();const v=$('#scCode').value;if(v.trim()){handleScan(v);$('#scCode').value=''}};
+ $('#scClr').onclick=()=>{SESS=[];drawSess()};
+ drawSess();VIEWS.escanear.refresh=drawSess;
+}
+function drawSess(){const l=$('#scList');if(!l)return;$('#scN').textContent=SESS.length;l.innerHTML=SESS.length?SESS.map(s=>`<div>${s.ok?`<span style="color:var(--g)">${ic('check',16)}</span>`:`<span style="color:var(--r)">${ic('x',16)}</span>`}<span class="code" style="font-family:Consolas,monospace;font-weight:700;color:var(--navy)">${esc(s.c)}</span><span style="flex:1;min-width:0">${esc(s.d)}</span><time class="muted" style="font-size:12px">${new Date(s.t).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})}</time></div>`).join(''):'<div class="muted" style="border:0">Aún no has escaneado nada.</div>'}
+async function startScanner(){
+ if(!window.isSecureContext){toast('La cámara requiere abrir la app con https (por ejemplo desde GitHub Pages).','err');return}
+ try{$('#scGo').disabled=true;await loadScript(H5Q);$('#reader').innerHTML='';SCN=new Html5Qrcode('reader',{verbose:false});
+  await SCN.start({facingMode:'environment'},{fps:10,qrbox:(w,h)=>{const s=Math.floor(Math.min(w,h)*.7);return{width:s,height:s}}},t=>handleScan(t),()=>{});
+  $('#scGo').hidden=true;$('#scStop').hidden=false;
+ }catch(e){console.error(e);SCN=null;toast(String(e.message||e).includes('Permission')||String(e).includes('NotAllowed')?'Permite el acceso a la cámara en el navegador.':'No se pudo abrir la cámara: '+(e.message||e),'err')}
+ finally{if($('#scGo'))$('#scGo').disabled=false}
+}
+function stopScanner(){if(SCN){const s=SCN;SCN=null;s.stop().then(()=>s.clear()).catch(()=>{})}if($('#scGo')){$('#scGo').hidden=false;$('#scStop').hidden=true}}
+async function handleScan(text){
+ const code=parseCode(text),now=Date.now();if(code===SCLAST.c&&now-SCLAST.t<3000)return;SCLAST={c:code,t:now};
+ const mode=$('#scMode')?.value||'ver',b=S.bienes[code];
+ if(!b){beep(false);SESS.unshift({c:code,d:'No registrado',ok:false,t:now});drawSess();toast(`${code} no está registrado`,'err');return}
+ if(mode==='ver'){beep(true);stopScanner();ficha(code);return}
+ if(mode==='verificar'){if(!canEditB(b)){beep(false);toast('Fuera de tu resguardo','err');return}await verificar(code);beep(true);SESS.unshift({c:code,d:`${b.descripcion} · ${espName(b.espacioId)}`,ok:true,t:now})}
+ if(mode==='asignar'){const e=$('#scEsp').value;if(!e){beep(false);toast('Primero elige el espacio destino','err');return}
+  const r=S.espacios[e]?.responsableId||b.responsableId||'';const d={espacioId:e,responsableId:r,ultimaVerif:now,verifPor:ME.nombre};
+  await DB.update('bienes/'+code,d);await logChanges(code,b,d);beep(true);SESS.unshift({c:code,d:`${b.descripcion} → ${espName(e)}`,ok:true,t:now})}
+ drawSess();const rd=$('#reader');if(rd){rd.classList.remove('flash');void rd.offsetWidth;rd.classList.add('flash')}
+}
+
+/* =====================================================================
+   VISTA: INFORMES
+   ===================================================================== */
+function vInformes(){
+ const all=seeAll();
+ $('#view').innerHTML=`<div class="cgrid">
+ <div class="ec"><h4>${ic('file')} Informe de situación por responsable</h4><div class="meta">Con el formato solicitado por la Subdirección: inmueble/espacio, bienes bajo resguardo, materiales, observaciones y necesidades, con firmas.</div>
+  ${all?`<label>Responsable<select id="iResp">${respOpts('','— Elegir —')}</select></label>`:''}<div class="acts"><button class="btn pri" id="iR">${ic('print')} Generar e imprimir</button></div></div>
+ <div class="ec"><h4>${ic('pin')} Inventario por espacio</h4><div class="meta">Lista de bienes y materiales de un espacio, con condiciones físicas.</div>
+  <label>Espacio<select id="iEsp">${opts(ESPACIOS().map(e=>[e.id,e.nombre]),'','— Todos —')}</select></label><div class="acts"><button class="btn pri" id="iE">${ic('print')} Imprimir</button></div></div>
+ <div class="ec"><h4>${ic('alert')} Bienes con problema</h4><div class="meta">Faltantes, dañados, en reparación, en mal estado o que no funcionan.</div><div class="acts"><button class="btn pri" id="iP">${ic('print')} Imprimir</button></div></div>
+ <div class="ec"><h4>${ic('alert')} Necesidades pendientes</h4><div class="meta">Mantenimiento, reparación, adecuación y adquisiciones por atender, ordenadas por prioridad.</div><div class="acts"><button class="btn pri" id="iN">${ic('print')} Imprimir</button></div></div>
+ <div class="ec"><h4>${ic('download')} Exportar a Excel</h4><div class="meta">Archivos CSV que abren directamente en Excel.</div><div class="acts"><button class="btn" id="xB">Bienes</button><button class="btn" id="xM">Materiales</button><button class="btn" id="xN">Necesidades</button></div></div>
+ </div>`;
+ $('#iR').onclick=()=>{const id=all?$('#iResp').value:ME.responsableId;if(!id)return toast(all?'Elige un responsable':'Tu usuario no está vinculado a un responsable. Pídelo al administrador.','err');informeResp(id)};
+ $('#iE').onclick=()=>informeEsp($('#iEsp').value);
+ $('#iP').onclick=informeProblemas;$('#iN').onclick=informeNec;
+ $('#xB').onclick=()=>csvBienes(BIENES());$('#xM').onclick=()=>csvMats(MATS());$('#xN').onclick=()=>csvNec(NECS());
+ VIEWS.informes.refresh=()=>{};
+}
+function repHead(title){const c=cfg();return`<h1>${esc(c.escuela.toUpperCase())}</h1><p class="sub">${esc(c.direccion)}${c.cct?' · CCT '+esc(c.cct):''} · Ciclo escolar ${esc(c.ciclo)}</p><h2>${title}</h2>`}
+function grpBienes(B){const g={};B.forEach(b=>{const k=[b.descripcion,b.marca,b.modelo,b.espacioId,b.estado,b.funciona,b.situacion].join('|');(g[k]??={...b,codes:[]}).codes.push(b.codigo)});return Object.values(g).map(x=>({...x,codes:x.codes.sort(ncmp)}))}
+const codesTxt=c=>c.length<=3?c.join(', '):`${c[0]} … ${c.at(-1)} (${c.length})`;
+function bienesTable(B,showEsp=true){const G=grpBienes(B);return G.length?`<table><tr><th>No.</th><th>Descripción del bien</th><th>Marca / modelo / serie</th>${showEsp?'<th>Espacio</th>':''}<th>Cant.</th><th>Estado físico</th><th>¿Funciona?</th><th>Situación</th><th>Código(s) QR</th></tr>${G.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.descripcion)}${x.observaciones?`<br><i style="font-size:8pt">${esc(x.observaciones)}</i>`:''}</td><td>${esc([x.marca,x.modelo,x.codes.length===1?x.serie:''].filter(Boolean).join(' / '))}${x.inventario&&x.codes.length===1?`<br>Inv. ${esc(x.inventario)}`:''}</td>${showEsp?`<td>${esc(espName(x.espacioId))}</td>`:''}<td style="text-align:center">${x.codes.length}</td><td>${esc(x.estado||'')}</td><td>${esc(x.funciona||'')}</td><td>${esc(x.situacion||'')}</td><td style="font-size:8pt">${esc(codesTxt(x.codes))}</td></tr>`).join('')}</table>`:'<p><i>Sin bienes registrados.</i></p>'}
+const isProb=b=>['Faltante','Dañado','En reparación'].includes(b.situacion)||b.estado==='Malo'||b.funciona==='No';
+function matsTable(M,showEsp=true){return M.length?`<table><tr><th>No.</th><th>Material</th><th>Cantidad</th><th>Unidad</th><th>Exacta / aprox.</th><th>Estado</th>${showEsp?'<th>Espacio</th>':''}<th>Observaciones</th></tr>${M.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.nombre)}</td><td style="text-align:center">${esc(x.cantidad??'')}</td><td>${esc(x.unidad||'')}</td><td>${esc(x.precision||'Exacta')}</td><td>${esc(x.estado||'')}</td>${showEsp?`<td>${esc(espName(x.espacioId))}</td>`:''}<td>${esc(x.observaciones||'')}</td></tr>`).join('')}</table>`:'<p><i>Sin materiales registrados.</i></p>'}
+function condTable(e){const c=e.condiciones||{},k=Object.keys(c);return k.length?`<table><tr><th>Elemento</th><th style="width:60px">Estado</th><th>Descripción</th></tr>${k.map(x=>`<tr><td>${esc(x)}</td><td style="text-align:center">${{B:'Bueno',R:'Regular',M:'Malo'}[c[x].e]||'—'}</td><td>${esc(c[x].d||'')}</td></tr>`).join('')}</table>`:'<p><i>Condiciones no registradas.</i></p>'}
+function necTable(N){return N.length?`<table><tr><th>No.</th><th>Necesidad detectada</th><th>Tipo</th><th>Prioridad</th><th>Estado</th></tr>${N.map((n,i)=>`<tr><td>${i+1}</td><td>${esc(n.descripcion)}${n.bienCodigo?` (${esc(n.bienCodigo)})`:''}</td><td>${esc(n.tipo)}</td><td>${esc(n.prioridad)}</td><td>${esc(n.estado)}</td></tr>`).join('')}</table>`:'<p><i>Sin necesidades registradas.</i></p>'}
+function informeResp(rid){
+ const r=S.responsables[rid];if(!r)return;const c=cfg();
+ const E=L('espacios').filter(e=>e.responsableId===rid).sort((a,b)=>ncmp(a.nombre,b.nombre));
+ const B=L('bienes','codigo').filter(b=>b.situacion!=='Baja'&&(b.responsableId===rid||(!b.responsableId&&S.espacios[b.espacioId]?.responsableId===rid))).sort((a,b)=>ncmp(a.codigo,b.codigo));
+ const M=L('materiales').filter(x=>x.responsableId===rid||(!x.responsableId&&S.espacios[x.espacioId]?.responsableId===rid));
+ const N=L('necesidades').filter(n=>n.estado!=='Atendida'&&(E.some(e=>e.id===n.espacioId)));
+ const P=B.filter(isProb);
+ printHTML(`${repHead('INFORME DE LA SITUACIÓN ACTUAL DE INMUEBLES, ESPACIOS, BIENES MUEBLES Y MATERIALES BAJO RESGUARDO')}
+ <p><b>${esc(c.recibeNombre)}</b><br>${esc(c.recibeCargo)}<br><b>${esc(c.voboNombre)}</b><br>${esc(c.voboCargo)}<br><b>P R E S E N T E S</b></p>
+ <p style="text-align:justify">En atención a su solicitud, me permito entregar el informe de la situación actual del inmueble, espacio, bienes muebles y materiales que tengo asignados o bajo mi resguardo, conforme a los aspectos señalados.</p>
+ <h3>DATOS DEL RESPONSABLE</h3><table><tr><td class="k">Nombre</td><td>${esc(r.nombre)}</td><td class="k">Cargo / función</td><td>${esc(r.cargo||'')}</td></tr><tr><td class="k">Turno</td><td>${esc(r.turno||'')}</td><td class="k">Fecha de elaboración</td><td>${fdLong()}</td></tr><tr><td class="k">Comisión o área</td><td colspan="3">${esc(r.area||E.map(e=>e.nombre).join(', '))}</td></tr></table>
+ <h3>1. INMUEBLE O ESPACIO ASIGNADO</h3>${E.length?E.map(e=>`<h4>${esc(e.nombre)} — ${esc([e.tipo,e.ubicacion].filter(Boolean).join(', '))}</h4>${condTable(e)}`).join(''):'<p><i>No tiene espacios asignados.</i></p>'}
+ <h4>Necesidades de mantenimiento, reparación o adecuación</h4>${necTable(N)}
+ <h3>2. BIENES MUEBLES BAJO RESGUARDO</h3>${bienesTable(B,E.length!==1)}
+ <h4>2.1 Bienes faltantes, dañados o que requieren reparación</h4>${P.length?`<table><tr><th>No.</th><th>Código</th><th>Bien</th><th>Situación</th><th>Estado</th><th>Descripción del problema</th></tr>${P.map((b,i)=>`<tr><td>${i+1}</td><td>${esc(b.codigo)}</td><td>${esc(b.descripcion)}</td><td>${esc(b.situacion)}</td><td>${esc(b.estado)}${b.funciona==='No'?' / no funciona':''}</td><td>${esc(b.observaciones||'')}</td></tr>`).join('')}</table>`:'<p><i>Ninguno.</i></p>'}
+ <h3>3. MATERIALES ASIGNADOS</h3>${matsTable(M,E.length!==1)}
+ <h3>4. OBSERVACIONES Y NECESIDADES</h3>${E.filter(e=>e.observaciones).map(e=>`<p><b>${esc(e.nombre)}:</b> ${esc(e.observaciones)}</p>`).join('')||''}<div style="border-bottom:1px solid #999;height:18px"></div><div style="border-bottom:1px solid #999;height:18px"></div><div style="border-bottom:1px solid #999;height:18px"></div>
+ <p class="decl">Declaro que la información contenida en el presente informe es clara, objetiva y veraz, y que considera únicamente los bienes y materiales que efectivamente se encuentran bajo mi responsabilidad.</p>
+ <div class="firmas"><div><b>ELABORÓ</b><br>${esc(r.nombre)}<br>${esc(r.cargo||'Responsable')}</div><div><b>RECIBIÓ</b><br>${esc(c.recibeNombre)}<br>${esc(c.recibeCargo)}</div><div><b>Vo. Bo.</b><br>${esc(c.voboNombre)}<br>${esc(c.voboCargo)}</div></div>`,'rep');
+}
+function informeEsp(id){
+ const E=id?[S.espacios[id]&&{...S.espacios[id],id}].filter(Boolean):ESPACIOS();const B=BIENES().filter(b=>b.situacion!=='Baja'),M=MATS();
+ printHTML(repHead('INVENTARIO POR ESPACIO')+`<p style="text-align:right">Fecha: ${fdLong()}</p>`+E.map(e=>`<h3>${esc(e.nombre)}</h3><p><b>Ubicación:</b> ${esc([e.tipo,e.ubicacion].filter(Boolean).join(', ')||'—')} · <b>Responsable:</b> ${esc(respName(e.responsableId))}</p><h4>Condiciones físicas</h4>${condTable(e)}<h4>Bienes</h4>${bienesTable(B.filter(b=>b.espacioId===e.id),false)}<h4>Materiales</h4>${matsTable(M.filter(x=>x.espacioId===e.id),false)}`).join('')+(id?'':`<h3>Bienes sin espacio asignado</h3>${bienesTable(B.filter(b=>!b.espacioId||!S.espacios[b.espacioId]),false)}`),'rep');
+}
+function informeProblemas(){const P=BIENES().filter(b=>b.situacion!=='Baja'&&isProb(b));
+ printHTML(repHead('REPORTE DE BIENES FALTANTES, DAÑADOS O QUE REQUIEREN REPARACIÓN')+`<p style="text-align:right">Fecha: ${fdLong()} · Total: ${P.length}</p>`+(P.length?`<table><tr><th>No.</th><th>Código</th><th>Bien</th><th>Espacio</th><th>Responsable</th><th>Situación</th><th>Estado</th><th>Observaciones</th></tr>${P.map((b,i)=>`<tr><td>${i+1}</td><td>${esc(b.codigo)}</td><td>${esc(b.descripcion)}</td><td>${esc(espName(b.espacioId))}</td><td>${esc(respName(b.responsableId))}</td><td>${esc(b.situacion)}</td><td>${esc(b.estado)}${b.funciona==='No'?' / no funciona':''}</td><td>${esc(b.observaciones||'')}</td></tr>`).join('')}</table>`:'<p>No hay bienes con problema.</p>'),'rep')}
+function informeNec(){const N=NECS().filter(n=>n.estado!=='Atendida');
+ printHTML(repHead('NECESIDADES PENDIENTES DE ATENCIÓN')+`<p style="text-align:right">Fecha: ${fdLong()} · Total: ${N.length}</p>`+(N.length?`<table><tr><th>No.</th><th>Espacio</th><th>Necesidad</th><th>Tipo</th><th>Prioridad</th><th>Estado</th><th>Reportó</th><th>Fecha</th></tr>${N.map((n,i)=>`<tr><td>${i+1}</td><td>${esc(espName(n.espacioId))}</td><td>${esc(n.descripcion)}${n.atencion?`<br><i>${esc(n.atencion)}</i>`:''}</td><td>${esc(n.tipo)}</td><td>${esc(n.prioridad)}</td><td>${esc(n.estado)}</td><td>${esc(n.reporto||'')}</td><td>${fdate(n.fecha)}</td></tr>`).join('')}</table>`:'<p>No hay necesidades pendientes.</p>'),'rep')}
+
+/* CSV */
+const csvRow=a=>a.map(v=>{v=String(v??'');return/[",\n;]/.test(v)?`"${v.replace(/"/g,'""')}"`:v}).join(',');
+const csvOut=(name,h,rows)=>dl(name,'﻿'+[csvRow(h),...rows.map(csvRow)].join('\r\n'),'text/csv;charset=utf-8');
+function csvBienes(B){csvOut(`bienes_${today()}.csv`,['Código','Descripción','Categoría','Marca','Modelo','No. serie','Inventario oficial','Espacio','Ubicación','Responsable','Estado físico','Funciona','Situación','Fecha de alta','Valor','Última verificación','Observaciones'],B.map(b=>[b.codigo,b.descripcion,b.categoria,b.marca,b.modelo,b.serie,b.inventario,espName(b.espacioId),S.espacios[b.espacioId]?.ubicacion,respName(b.responsableId),b.estado,b.funciona,b.situacion,b.fechaAlta,b.valor,b.ultimaVerif?fdt(b.ultimaVerif):'',b.observaciones]))}
+function csvMats(M){csvOut(`materiales_${today()}.csv`,['Material','Cantidad','Unidad','Precisión','Estado','Espacio','Responsable','Observaciones'],M.map(x=>[x.nombre,x.cantidad,x.unidad,x.precision,x.estado,espName(x.espacioId),respName(x.responsableId),x.observaciones]))}
+function csvNec(N){csvOut(`necesidades_${today()}.csv`,['Espacio','Descripción','Tipo','Prioridad','Estado','Seguimiento','Bien','Reportó','Fecha'],N.map(n=>[espName(n.espacioId),n.descripcion,n.tipo,n.prioridad,n.estado,n.atencion,n.bienCodigo,n.reporto,fdate(n.fecha)]))}
+
+/* =====================================================================
+   VISTA: CONFIGURACIÓN (solo administrador)
+   ===================================================================== */
+function vConfig(){
+ const c=cfg(),cloud=DB.mode==='firebase';
+ $('#view').innerHTML=`
+ <div class="card"><h3 class="sec" style="margin-top:0">${ic('home',16)} Datos de la escuela e informes</h3>
+ <form class="fg" id="fc" onsubmit="return false">
+  <label class="c2">Nombre de la escuela<input name="escuela" value="${esc(c.escuela)}"></label>
+  <label>Nombre corto (aparece en las etiquetas)<input name="escCorto" maxlength="40" value="${esc(c.escCorto)}"></label>
+  <label>CCT<input name="cct" value="${esc(c.cct)}"></label>
+  <label>Dirección<input name="direccion" value="${esc(c.direccion)}"></label>
+  <label>Ciclo escolar<input name="ciclo" value="${esc(c.ciclo)}"></label>
+  <label>Recibe el informe (nombre)<input name="recibeNombre" value="${esc(c.recibeNombre)}"></label>
+  <label>Recibe (cargo)<input name="recibeCargo" value="${esc(c.recibeCargo)}"></label>
+  <label>Vo. Bo. (nombre)<input name="voboNombre" value="${esc(c.voboNombre)}"></label>
+  <label>Vo. Bo. (cargo)<input name="voboCargo" value="${esc(c.voboCargo)}"></label>
+  <label>Prefijo de los códigos<input name="prefijo" maxlength="5" value="${esc(c.prefijo)}"><small>Ej. BM → BM-0001. Siguiente código: <b id="nextC">…</b></small></label>
+  <label>Contenido del QR<select name="qrModo">${opts([['url','Enlace a la app (se abre con la cámara del celular)'],['codigo','Solo el código']],c.qrModo)}</select></label>
+  <label class="c2">Dirección web de la app (para el enlace del QR)<input name="urlBase" value="${esc(c.urlBase)}" placeholder="https://usuario.github.io/inventario/"><small>Si cambias la app de dirección, actualiza este dato y reimprime las etiquetas.</small></label>
+  <label class="c2">Categorías de bienes (una por renglón)<textarea name="__cats" rows="5">${esc(c.categorias.join('\n'))}</textarea></label>
+ </form><div class="toolbar" style="margin:12px 0 0"><button class="btn pri" id="cSave">${ic('check')} Guardar configuración</button></div></div>
+
+ <div class="card" style="margin-top:14px"><h3 class="sec" style="margin-top:0">${ic('users',16)} Usuarios con acceso</h3><div id="uBox"></div></div>
+
+ <div class="card" style="margin-top:14px"><h3 class="sec" style="margin-top:0">${ic('download',16)} Respaldo de la información</h3>
+  <p class="muted" style="margin-top:0">Descarga periódicamente un respaldo completo (incluye historial y fotos). También sirve para pasar los datos del modo local a la nube.</p>
+  <div class="toolbar"><button class="btn" id="bkOut">${ic('download')} Descargar respaldo (.json)</button><label class="btn" style="flex-direction:row;font-weight:400">${ic('upload')} Restaurar respaldo<input type="file" accept=".json,application/json" id="bkIn" hidden></label></div></div>
+
+ <div class="card" style="margin-top:14px"><h3 class="sec" style="margin-top:0">${ic('gear',16)} Conexión</h3>
+  <p style="margin:0">${cloud?`<span class="pill g">Nube (Firebase)</span> Los datos se comparten en tiempo real entre todas las computadoras y celulares.`:`<span class="pill a">Modo local</span> Los datos se guardan solo en este navegador. Para usar la app desde varios equipos, pega la configuración de Firebase al inicio del archivo <b>index.html</b> (constante <code>FIREBASE_CONFIG</code>).`}</p></div>`;
+ DB.get('counters/bien').then(n=>{const e=$('#nextC');if(e)e.textContent=mkCode((n||0)+1)});
+ $('#cSave').onclick=async()=>{const f=$('#fc');const d=readForm(f);d.categorias=$('[name=__cats]',f).value.split('\n').map(s=>s.trim()).filter(Boolean);d.prefijo=(d.prefijo||'BM').replace(/[^A-Za-z0-9]/g,'').toUpperCase()||'BM';await DB.update('config',d);toast('Configuración guardada','ok');$('#brSchool').textContent=d.escCorto};
+ $('#bkOut').onclick=async()=>{toast('Preparando respaldo…');const all=await DB.get('');const o={...all};delete o.usuarios;dl(`respaldo_inventario_${today()}.json`,JSON.stringify({app:'InventarioQR',v:1,fecha:new Date().toISOString(),datos:o}),'application/json')};
+ $('#bkIn').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const j=JSON.parse(await f.text());const d=j.datos||j;const keys=['espacios','responsables','bienes','materiales','necesidades','config','counters','movimientos','fotos'].filter(k=>k in d);
+  if(!keys.length)throw new Error('El archivo no parece un respaldo de esta app');
+  if(!await confirmDlg(`Se reemplazará la información actual (${keys.join(', ')}) con la del respaldo del ${j.fecha?fdate(j.fecha):'archivo'}. ¿Continuar?`,'Restaurar','dan'))return;
+  const up={};keys.forEach(k=>up[k]=d[k]);await DB.multi(up);toast('Respaldo restaurado','ok')}catch(err){toast('No se pudo restaurar: '+err.message,'err')}};
+ const users=()=>{const box=$('#uBox');if(!box)return;
+  if(!cloud){box.innerHTML='<p class="muted" style="margin:0">Los usuarios y contraseñas se activan al conectar la app a Firebase. En modo local cualquiera que abra este navegador entra como administrador.</p>';return}
+  const U=L('usuarios').sort((a,b)=>ncmp(a.nombre,b.nombre));
+  box.innerHTML=`<p class="muted" style="margin-top:0">El <b>administrador</b> (contraloría) controla todo. El <b>responsable</b> solo ve y actualiza lo que tiene bajo su resguardo, y genera su propio informe. <b>Solo consulta</b> ve todo sin modificar.</p>
+  <div class="tw"><table class="rt"><thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Vinculado a</th><th>Estado</th><th></th></tr></thead><tbody>${U.map(u=>`<tr data-id="${u.id}"><td data-l="Nombre"><b>${esc(u.nombre)}</b></td><td data-l="Correo">${esc(u.email)}</td><td data-l="Rol">${esc(ROLES[u.rol]||u.rol)}</td><td data-l="Vinculado a">${esc(u.responsableId?respName(u.responsableId):'—')}</td><td data-l="Estado">${u.activo===false?pill('Inactivo',{Inactivo:'r'}):pill('Activo',{Activo:'g'})}</td><td data-l=""><button class="icon-btn" title="Editar">${ic('edit',16)}</button></td></tr>`).join('')}</tbody></table></div>
+  <div class="toolbar" style="margin:12px 0 0"><button class="btn pri" id="uAdd">${ic('plus')} Nuevo usuario</button></div>`;
+  $('#uAdd').onclick=()=>userForm();$$('#uBox tr[data-id] .icon-btn').forEach(b=>b.onclick=()=>userForm(b.closest('tr').dataset.id));
+ };
+ users();VIEWS.config.refresh=users;
+}
+function userForm(id){
+ const u=id?{...S.usuarios[id]}:{rol:'responsable',activo:true};const self=id===ME.uid;
+ const m=openModal({title:id?'Editar usuario':'Nuevo usuario',body:`<form class="fg" id="fu" onsubmit="return false">
+  <label class="c2">Nombre completo *<input name="nombre" required value="${esc(u.nombre)}"></label>
+  ${id?`<label class="c2">Correo<input value="${esc(u.email)}" readonly></label>`:`<label>Correo *<input type="email" name="__email" required></label><label>Contraseña inicial *<input name="__pass" required minlength="6" placeholder="Mínimo 6 caracteres"></label>`}
+  <label>Rol<select name="rol" ${self?'disabled':''}>${opts(Object.entries(ROLES),u.rol)}</select></label>
+  <label>Vincular con responsable<select name="responsableId">${respOpts(u.responsableId,'— Ninguno —')}</select><small>Necesario para el rol "Responsable".</small></label>
+  ${id&&!self?`<label class="c2" style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" name="activo" ${u.activo!==false?'checked':''}> Usuario activo (desmarca para quitarle el acceso)</label>`:''}</form>`,
+  actions:[...(id?[{label:'Enviar correo para cambiar contraseña',fn:async()=>{await firebase.auth().sendPasswordResetEmail(u.email);toast('Correo enviado a '+u.email,'ok')}}]:[]),CANCEL,{label:ic('check')+' Guardar',cls:'pri',fn:async(m)=>{const f=$('#fu',m);if(!f.reportValidity())return;const d=readForm(f);if(self)d.rol='admin';
+   if(d.rol==='responsable'&&!d.responsableId)return toast('Vincula al usuario con un responsable','err');
+   if(id){await DB.update('usuarios/'+id,d)}else{
+    const email=$('[name=__email]',f).value.trim(),pass=$('[name=__pass]',f).value;
+    const sec=firebase.apps.find(a=>a.name==='sec')||firebase.initializeApp(FIREBASE_CONFIG,'sec');
+    try{const cr=await sec.auth().createUserWithEmailAndPassword(email,pass);await DB.set('usuarios/'+cr.user.uid,{...d,email,activo:true,creado:Date.now()});await sec.auth().signOut()}
+    catch(e){throw new Error(authMsg(e))}}
+   closeModal(m);toast('Usuario guardado','ok')}}]});
+}
+
+/* =====================================================================
+   ARRANQUE, SESIÓN Y PWA
+   ===================================================================== */
+function authMsg(e){const c=e.code||'';return({'auth/invalid-email':'El correo no es válido.','auth/user-not-found':'Usuario o contraseña incorrectos.','auth/wrong-password':'Usuario o contraseña incorrectos.','auth/invalid-credential':'Usuario o contraseña incorrectos.','auth/invalid-login-credentials':'Usuario o contraseña incorrectos.','auth/too-many-requests':'Demasiados intentos. Espera unos minutos.','auth/email-already-in-use':'Ese correo ya tiene una cuenta.','auth/weak-password':'La contraseña debe tener al menos 6 caracteres.','auth/network-request-failed':'Sin conexión a internet.','auth/operation-not-allowed':'Activa "Correo/contraseña" en Firebase Authentication.'})[c]||e.message||String(e)}
+function startApp(){
+ $('#login').hidden=true;$('#app').hidden=false;
+ $('#who').textContent=ME.nombre||ME.email||'';$('#role').textContent=ROLES[ME.rol]||'';
+ $('#modeTag').textContent=DB.mode==='local'?'Modo local':'En la nube';$('#modeTag').className='mode'+(DB.mode==='local'?'':' cloud');
+ $('#modeTag').title=DB.mode==='local'?'Los datos se guardan solo en este navegador':'Datos compartidos en tiempo real';
+ buildNav();
+ let v='inicio';try{v=localStorage.getItem('invqr_view')||'inicio'}catch(e){}
+ go(v);
+}
+function onFirstBienes(){if(PENDING&&ME){const c=PENDING;PENDING=null;setTimeout(()=>ficha(c),200)}}
+function readHash(){const m=location.hash.match(/b=([^&]+)/);if(m){PENDING=decodeURIComponent(m[1]).toUpperCase();history.replaceState(null,'',location.pathname+location.search);if(ME&&LOADED.has('bienes'))onFirstBienes()}}
+
+DB.on('*',onData);
+DB.on('bienes',()=>onFirstBienes());
+DB.on('config',()=>{const c=cfg();$('#brSchool').textContent=c.escCorto;$('#lgSchool').textContent=c.escuela});
+
+function boot(){
+ $('#lgIcon').innerHTML=ic('qr',40);$('#brIcon').innerHTML=ic('qr',22);$('#hamb').innerHTML=ic('menu',22);$('#fab').innerHTML=ic('scan',26);
+ $('#btnOut').innerHTML=ic('logout',15)+' Cerrar sesión';$('#btnInstall').innerHTML=ic('install',15)+' Instalar app';
+ $('#hamb').onclick=()=>document.body.classList.toggle('nav-open');$('#scrim').onclick=()=>document.body.classList.remove('nav-open');
+ $('#fab').onclick=()=>go('escanear');
+ readHash();window.addEventListener('hashchange',readHash);
+ const useCloud=!!(FIREBASE_CONFIG.apiKey&&FIREBASE_CONFIG.databaseURL&&window.firebase);
+ if(!useCloud){
+  DB.mode='local';ME={uid:'local',nombre:'Contraloría',rol:'admin',email:''};
+  $('#btnOut').hidden=true;DB.start();startApp();return;
+ }
+ DB.mode='firebase';firebase.initializeApp(FIREBASE_CONFIG);fdb=firebase.database();
+ $('#btnOut').onclick=async()=>{if(await confirmDlg('¿Cerrar sesión?','Cerrar sesión')){DB.stop();ME=null;await firebase.auth().signOut();location.reload()}};
+ $('#lgForm').onsubmit=async e=>{e.preventDefault();$('#loginErr').textContent='';const b=$('#lgForm .btn.pri');b.disabled=true;
+  try{await firebase.auth().signInWithEmailAndPassword($('#lgEmail').value.trim(),$('#lgPass').value)}catch(err){$('#loginErr').textContent=authMsg(err)}finally{b.disabled=false}};
+ $('#lgReset').onclick=async()=>{const em=$('#lgEmail').value.trim();if(!em){$('#loginErr').textContent='Escribe tu correo y vuelve a presionar.';return}try{await firebase.auth().sendPasswordResetEmail(em);$('#loginErr').style.color='var(--g)';$('#loginErr').textContent='Te enviamos un correo para cambiar la contraseña.'}catch(err){$('#loginErr').textContent=authMsg(err)}};
+ firebase.auth().onAuthStateChanged(async u=>{
+  if(!u){$('#app').hidden=true;$('#login').hidden=false;return}
+  try{
+   let rec=(await fdb.ref(ROOT+'/usuarios/'+u.uid).once('value')).val();
+   if(!rec){const any=(await fdb.ref(ROOT+'/usuarios').limitToFirst(1).once('value')).exists();
+    if(any){$('#loginErr').textContent='Tu cuenta no tiene acceso a esta app. Pide al administrador que te dé de alta.';await firebase.auth().signOut();return}
+    rec={email:u.email,nombre:u.email.split('@')[0],rol:'admin',activo:true,creado:Date.now()};await fdb.ref(ROOT+'/usuarios/'+u.uid).set(rec);toast('Eres el primer usuario: quedaste como administrador','ok')}
+   if(rec.activo===false){$('#loginErr').textContent='Tu usuario está desactivado.';await firebase.auth().signOut();return}
+   ME={uid:u.uid,...rec};
+   fdb.ref(ROOT+'/usuarios/'+u.uid).on('value',sn=>{const v=sn.val();if(!v||v.activo===false){firebase.auth().signOut().then(()=>location.reload());return}const ch=v.rol!==ME.rol||v.responsableId!==ME.responsableId;ME={uid:u.uid,...v};if(ch){buildNav();go(CUR)}});
+   DB.start();startApp();
+  }catch(err){console.error(err);$('#loginErr').textContent='No se pudo leer la base de datos. Revisa las reglas de Realtime Database. ('+(err.code||err.message)+')';await firebase.auth().signOut()}
+ });
+}
+
+/* PWA */
+let DEFP=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();DEFP=e;const b=$('#btnInstall');b.hidden=false;b.onclick=async()=>{DEFP.prompt();await DEFP.userChoice;DEFP=null;b.hidden=true}});
+if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)&&location.hostname!=='localhost')navigator.serviceWorker.register('sw.js').catch(()=>{});
+window.addEventListener('afterprint',()=>{$('#printArea').innerHTML=''});
+boot();
+</script>
+</body>
+</html>
