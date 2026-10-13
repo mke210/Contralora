@@ -199,6 +199,43 @@ table.rt{width:100%;border-collapse:collapse;font-size:14px}
 .pick label{flex-direction:row;align-items:center;gap:10px;font-weight:400;padding:8px 12px;border-bottom:1px solid #EEF1F6;cursor:pointer;font-size:14px}
 .pick label:hover{background:#F8FAFD}
 .pick .code{font-family:Consolas,monospace;font-weight:700;color:var(--navy);min-width:72px}
+.vtabs{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.vtabs button{border:0;background:none;padding:8px 14px;cursor:pointer;display:inline-flex;gap:7px;align-items:center;font-size:14px;color:var(--mut)}
+.vtabs button.on{background:var(--navy);color:#fff}
+.cq{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:14px;align-items:start}
+.cqmap{background:#fff;border:1px solid var(--line);border-radius:var(--rad);overflow:hidden;position:relative}
+.cqsc{overflow:auto;-webkit-overflow-scrolling:touch;max-height:76vh}
+#cqSvg{display:block;width:100%;min-width:660px;height:auto;user-select:none}
+.cqzoom{position:absolute;right:10px;top:10px;display:flex;gap:4px;z-index:2}
+.cqzoom button{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:18px;font-weight:700;color:var(--navy)}
+.cqleg{display:flex;flex-wrap:wrap;gap:6px 14px;padding:9px 12px;border-top:1px solid var(--line);font-size:12.5px;color:var(--mut)}
+.cqleg i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:5px;border:1px solid rgba(0,0,0,.15)}
+.cr{cursor:pointer;stroke:#8C98AB;stroke-width:.7;transition:fill .15s}
+.cr:hover{filter:brightness(1.07);stroke:#1F3864;stroke-width:1.4}
+.cr.nolink{fill-opacity:.45}
+.cr.hit{fill:#FFD54A!important;fill-opacity:1;stroke:#1C2433;stroke-width:1.5}
+.cr.sel{stroke:#1F3864;stroke-width:2.6}
+.cdim .cr:not(.hit):not(.sel){fill-opacity:.25}
+.clb{font-family:"Arial Narrow",Arial,sans-serif;font-weight:700;fill:#1C2433;pointer-events:none;text-transform:uppercase}
+.cbadge circle{fill:#C0392B;stroke:#fff;stroke-width:1}
+.cbadge text{fill:#fff;font:700 7.5px Arial,sans-serif;pointer-events:none}
+.cprob{fill:#C0392B;stroke:#fff;stroke-width:.8;pointer-events:none}
+.cpulse{fill:none;stroke:#E0A800;stroke-width:2.5;animation:cpu 1.4s ease-out infinite;pointer-events:none}
+@keyframes cpu{0%{r:6;opacity:1}100%{r:28;opacity:0}}
+.cqp{background:#fff;border:1px solid var(--line);border-radius:var(--rad);padding:16px;min-width:0}
+.cqp h3{margin:0;font-size:19px;color:var(--navy)}
+.cqp h4{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);margin:16px 0 6px}
+.cqp dl{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;margin:10px 0 0;font-size:14px}
+.cqp dt{color:var(--mut)}.cqp dd{margin:0;font-weight:600}
+.cqrow{display:flex;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid #EEF1F6;font-size:14px;cursor:pointer}
+.cqrow:hover{background:#F8FAFD}
+.cqrow .n{min-width:30px;text-align:center;font-weight:700;color:var(--navy);background:#EEF2F8;border-radius:6px;padding:1px 6px}
+.cqrow .t{flex:1;min-width:0}
+.cqrow .t small{display:block;color:var(--mut);font-size:12px}
+.cqres{max-height:300px;overflow:auto}
+.cqgrp{font-size:12px;font-weight:700;color:var(--mut);text-transform:uppercase;margin:10px 0 2px}
+mark{background:#FFE58A;padding:0 1px;border-radius:2px}
+@media(max-width:1000px){.cq{grid-template-columns:1fr}.cqsc{max-height:none}}
 .prev{background:#E9EDF3;border-radius:var(--rad);padding:16px;overflow:auto;max-height:70vh}
 
 /* Toast */
@@ -698,6 +735,7 @@ async function ficha(code){
  const acts=[];
  if(canEdit())acts.push({label:ic('qr')+' Etiqueta',fn:()=>printLabels([code],c.etiqTam)});
  if(can)acts.push({label:ic('check')+' Verificar',fn:async(m)=>{await verificar(code);closeModal(m);ficha(code)}});
+ if(roomOfBien(b))acts.unshift({label:ic('pin')+' Ver en croquis',fn:()=>verEnCroquis(code)});
  if(isAdmin()&&b.situacion!=='Baja')acts.push({label:ic('trash')+' Dar de baja',cls:'dan',fn:(m)=>{closeModal(m);darBaja([code])}});
  if(isAdmin()&&b.situacion==='Baja')acts.push({label:ic('print')+' Acta de baja',fn:()=>informeBajas([code])},{label:'Reactivar',fn:async(m)=>{if(await confirmDlg(`¿Reactivar <b>${esc(code)}</b> y quitarle la baja?`,'Reactivar')){await DB.update('bienes/'+code,{situacion:'En uso',baja:null});await DB.push('movimientos/'+code,{t:Date.now(),u:ME.nombre,tipo:'Reactivación',det:'Se canceló la baja'});closeModal(m);ficha(code)}}});
  if(isAdmin())acts.push({label:ic('x')+' Eliminar',cls:'dan',fn:async(m)=>{if(await confirmDlg(`¿Eliminar definitivamente <b>${esc(code)}</b>? Si el bien se dio de baja, mejor cambia su situación a "Baja" para conservar el historial.`,'Eliminar','dan')){await DB.multi({['bienes/'+code]:null,['fotos/'+code]:null,['movimientos/'+code]:null});SEL.delete(code);closeModal(m);toast('Bien eliminado')}}});
@@ -784,9 +822,166 @@ function massState(){
 /* =====================================================================
    VISTA: ESPACIOS
    ===================================================================== */
-let EQ='';
+/* =====================================================================
+   CROQUIS DE LA ESCUELA (mismas coordenadas del Plano Escolar / Croquis de evacuación)
+   [id, nombre, x, y, ancho, alto, nave, tipo, etiqueta corta]
+   ===================================================================== */
+const CROQUIS=[
+ ['estacionamiento','Estacionamiento',15,17,46,150,'','exterior'],
+ ['aula-medios','Aula de medios',67,12,52,68,'Nave 2','lab'],['laboratorio-1','Laboratorio',67,82,52,70,'Nave 2','lab'],
+ ['a6','A6',126,12,46,30,'Nave 5','aula'],['a5','A5',126,42,46,30,'Nave 5','aula'],['a4','A4',126,82,46,34,'Nave 4','aula'],['a3','A3',126,116,46,36,'Nave 4','aula'],
+ ['a10','A10',230,76,42,25,'Nave 7','aula'],['a9','A9',230,101,42,25,'Nave 7','aula'],['a8','A8',230,126,42,26,'Nave 7','aula'],
+ ['a12','A12',230,12,40,28,'Nave 8','aula'],['a11','A11',230,40,40,28,'Nave 8','aula'],['a15','A15',280,12,52,26,'Nave 10','aula'],['bano-n10','Baño (Nave 10)',280,38,52,24,'Nave 10','serv','Baño'],
+ ['bodega-n10','Bodega (Nave 10)',336,12,28,50,'','serv','Bodega'],['a14','A14',312,92,40,26,'Nave 9','aula'],['a13','A13',312,118,40,27,'Nave 9','aula'],
+ ['a19','A19',384,12,26,32,'Nave 13','aula'],['a18','A18',384,44,26,32,'Nave 13','aula'],['a17','A17',384,76,26,32,'Nave 13','aula'],['a16','A16',384,108,26,36,'Nave 13','aula'],
+ ['a20','A20',436,48,40,26,'Nave 14','aula'],['a21','A21',436,74,40,26,'Nave 14','aula'],['a22','A22',436,100,40,25,'Nave 14','aula'],
+ ['taller-n12','Taller (Nave 12)',394,158,42,59,'Nave 12','taller','Taller'],['taller-n11','Taller (Nave 11)',338,267,48,66,'Nave 11','taller','Taller'],
+ ['techado-1','Techado 1',440,134,43,120,'','techado','Techado'],['techado-2','Techado 2',441,256,146,72,'','techado','Techado'],
+ ['cancha','Cancha de fútbol',491,39,279,203,'','cancha'],
+ ['galera','Galera',83,180,30,84,'','techado'],['prefectura','Prefectura',42,279,32,53,'','admin'],
+ ['admin-t2','Administración T2',128,180,74,17,'Nave 3','admin','Admin. T2'],['direccion','Dirección',128,197,74,17,'Nave 3','admin'],['admin-t1','Administración T1',128,230,74,18,'Nave 3','admin','Admin. T1'],
+ ['servicio-medico','Servicio médico',140,269,20,30,'','serv','S. médico'],['bodega-z1','Bodega (junto a S. médico)',161,269,20,30,'','serv','Bodega'],['coordinacion','Coordinación académica',182,269,21,30,'','admin','Coord.'],
+ ['biblioteca','Biblioteca',128,300,75,42,'','serv'],['a2','A2',84,290,30,38,'Nave 1','aula'],['a1','A1',84,330,30,46,'Nave 1','aula'],['trabajo-social','Trabajo Social',128,344,75,32,'','admin'],
+ ['laboratorio-2','Laboratorio 2',248,201,70,37,'Nave 6','lab'],
+ ['contraloria','Contraloría',248,244,66,21,'','admin'],['a7','A7',248,267,62,36,'','aula'],['bano-z5','Baño (junto a A7)',248,305,62,28,'','serv','Baño'],
+ ['cafeteria','Cafetería',316,340,84,52,'','serv'],['a23','A23',438,340,26,52,'Nave 15','aula'],['a24','A24',466,340,26,52,'Nave 15','aula'],['a25','A25',494,340,26,52,'Nave 15','aula'],
+ ['bodega-n15a','Bodega 1 (Nave 15)',522,340,26,52,'','serv','Bodega'],['bodega-n15b','Bodega 2 (Nave 15)',550,340,26,52,'','serv','Bodega'],
+ ['taller-n16','Taller de Turismo (Nave 16)',607,251,40,78,'Nave 16','taller','Taller Turismo'],['taller-n17','Taller de Circuitos eléctricos (Nave 17)',692,255,42,78,'Nave 17','taller','Taller Circuitos'],
+ ['bano-general','Baño general',400,268,24,58,'','serv','Baño']
+].map(r=>({id:r[0],nombre:r[1],x:r[2],y:r[3],w:r[4],h:r[5],nave:r[6],t:r[7],lab:r[8]||r[1]}));
+const CQ=Object.fromEntries(CROQUIS.map(r=>[r.id,r]));
+const CQT={aula:['Aulas','#9CC3F0'],taller:['Talleres','#F5B452'],lab:['Laboratorios y medios','#73C7B4'],admin:['Administración','#B9A3E6'],serv:['Servicios y bodegas','#C9D0C5'],techado:['Techados','#D5D9DE'],cancha:['Cancha','#8CC98F'],exterior:['Exterior','#E3E6EA']};
+const cqName=id=>CQ[id]?.nombre||'';
+function cqTipoEsp(r){const n=norm(r.nombre);return r.t==='aula'?'Aula':r.t==='taller'?'Taller':r.t==='lab'?(n.includes('medios')?'Sala de cómputo':'Laboratorio'):r.t==='admin'?(n.includes('direccion')?'Dirección / Subdirección':'Oficina'):r.t==='serv'?(n.includes('biblioteca')?'Biblioteca':n.includes('bano')?'Sanitarios':n.includes('bodega')?'Bodega':n.includes('cafeteria')?'Cooperativa':'Otro'):'Patio / Cancha'}
+const espOfRoom=id=>L('espacios').filter(e=>e.mapaId===id);
+const roomOfBien=b=>S.espacios[b.espacioId]?.mapaId||'';
+const CQS={q:'',sel:'',zoom:1};
+let ESPVIEW='mapa';try{ESPVIEW=localStorage.getItem('invqr_espview')||'mapa'}catch(e){}
+
 function vEspacios(){
- $('#view').innerHTML=`<div class="toolbar"><div class="grow">${ic('search',16)}<input id="eq" placeholder="Buscar espacio, ubicación o responsable…" value="${esc(EQ)}"></div>
+ $('#view').innerHTML=`<div class="toolbar"><div class="vtabs"><button data-v="mapa" class="${ESPVIEW==='mapa'?'on':''}">${ic('pin',16)} Croquis</button><button data-v="lista" class="${ESPVIEW==='lista'?'on':''}">${ic('layers',16)} Tarjetas</button></div></div><div id="espBody"></div>`;
+ $$('.vtabs button').forEach(b=>b.onclick=()=>{ESPVIEW=b.dataset.v;try{localStorage.setItem('invqr_espview',ESPVIEW)}catch(e){}vEspacios()});
+ if(ESPVIEW==='mapa')vCroquis();else vEspaciosLista();
+}
+
+function cqSVG(){
+ const lab=(r)=>{const t=r.lab,vert=r.h>r.w*1.3,len=t.length,room=vert?r.h:r.w;let fs=Math.min(11,(room-5)/(len*.6),(vert?r.w:r.h)*.42);fs=Math.max(fs,4.6);const cx=r.x+r.w/2,cy=r.y+r.h/2;
+  if(r.t==='cancha')return`<text class="clb" font-size="11" text-anchor="middle" x="${cx}" y="${r.y+16}">${esc(t)}</text>`;
+  return`<text class="clb" font-size="${fs.toFixed(1)}" text-anchor="middle" dominant-baseline="central" transform="translate(${cx} ${cy})${vert?' rotate(-90)':''}">${esc(t)}</text>`};
+ const pitch=r=>`<g pointer-events="none" stroke="#fff" stroke-width=".9" fill="none" opacity=".9"><rect x="${r.x+6}" y="${r.y+24}" width="${r.w-12}" height="${r.h-30}"/><line x1="${r.x+r.w/2}" y1="${r.y+24}" x2="${r.x+r.w/2}" y2="${r.y+r.h-6}"/><circle cx="${r.x+r.w/2}" cy="${r.y+24+(r.h-30)/2}" r="20"/><rect x="${r.x+6}" y="${r.y+r.h/2-14}" width="22" height="40"/><rect x="${r.x+r.w-28}" y="${r.y+r.h/2-14}" width="22" height="40"/></g>`;
+ return`<svg id="cqSvg" viewBox="0 0 774 404" role="img" aria-label="Croquis de la escuela">
+ <rect width="774" height="404" fill="#F6F8FA"/><rect x="485" width="289" height="404" fill="#E4EEDD"/>
+ <text x="760" y="396" text-anchor="end" font-size="8" font-weight="700" fill="#7A8699" letter-spacing="1.2">EXPLANADA</text>
+ ${[[30,180,13],[40,372,12],[48,300,10],[357,148,8],[498,19,8],[756,19,8]].map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#8FB17E" opacity=".75"/>`).join('')}
+ <g id="cqRooms">${CROQUIS.map(r=>`<g data-r="${r.id}" tabindex="0" role="button" aria-label="${esc(r.nombre)}"><rect class="cr" data-r="${r.id}" x="${r.x}" y="${r.y}" width="${r.w}" height="${r.h}" rx="1.5" fill="${CQT[r.t][1]}"><title>${esc(r.nombre)}${r.nave?' · '+r.nave:''}</title></rect>${r.t==='cancha'?pitch(r):''}${lab(r)}</g>`).join('')}</g>
+ <g id="cqFx"></g></svg>`;
+}
+
+function vCroquis(){
+ const adm=isAdmin(),unl=()=>CROQUIS.filter(r=>!espOfRoom(r.id).length).length;
+ $('#espBody').innerHTML=`<div class="toolbar"><div class="grow">${ic('search',16)}<input id="cqQ" placeholder="Buscar código, No. de serie, artículo, material, espacio o responsable…" value="${esc(CQS.q)}" autocomplete="off"></div>
+  ${adm?`<button class="btn" id="cqLink" title="Crea o vincula un espacio del inventario para cada lugar del croquis">${ic('plus')} Vincular croquis <span class="pill n" id="cqUnl">${unl()}</span></button><button class="btn pri" id="eAdd2">${ic('plus')} Nuevo espacio</button>`:''}</div>
+ <div class="cq"><div class="cqmap"><div class="cqzoom"><button id="zIn" aria-label="Acercar">+</button><button id="zOut" aria-label="Alejar">−</button></div><div class="cqsc">${cqSVG()}</div>
+  <div class="cqleg">${Object.entries(CQT).filter(([k])=>k!=='exterior').map(([k,[n,c]])=>`<span><i style="background:${c}"></i>${n}</span>`).join('')}<span><i style="background:#FFD54A"></i>Coincide con la búsqueda</span><span><svg width="10" height="10"><circle cx="5" cy="5" r="4" fill="#C0392B"/></svg> Con bienes dañados o faltantes</span><span>Tono claro = sin vincular</span></div></div>
+  <aside class="cqp" id="cqPanel"></aside></div>`;
+ const svg=$('#cqSvg'),setZ=()=>{svg.style.width=(CQS.zoom*100)+'%';svg.style.minWidth=(660*CQS.zoom)+'px'};setZ();
+ $('#zIn').onclick=()=>{CQS.zoom=Math.min(3,CQS.zoom+.5);setZ()};$('#zOut').onclick=()=>{CQS.zoom=Math.max(1,CQS.zoom-.5);setZ()};
+ svg.addEventListener('click',e=>{const g=e.target.closest('[data-r]');if(g){CQS.sel=g.dataset.r;paint();panel(true)}});
+ svg.addEventListener('keydown',e=>{const g=e.target.closest('g[data-r]');if(g&&(e.key==='Enter'||e.key===' ')){e.preventDefault();CQS.sel=g.dataset.r;paint();panel(true)}});
+ $('#cqQ').oninput=debounce(()=>{CQS.q=$('#cqQ').value;const H=hits();const ks=Object.keys(H.rooms);if(ks.length===1)CQS.sel=ks[0];else if(CQS.q.trim())CQS.sel='';paint();panel()},180);
+ if($('#eAdd2'))$('#eAdd2').onclick=()=>espForm();
+ if($('#cqLink'))$('#cqLink').onclick=linkCroquis;
+
+ function hits(){
+  const q=norm(CQS.q).trim(),R={rooms:{},bienes:[],mats:[],esps:[],resps:[],rooms0:[],sinUb:0};if(!q)return R;
+  const add=(id,k)=>{if(!id){R.sinUb++;return}(R.rooms[id]??={b:0,m:0,e:0,r:0})[k]++};
+  R.bienes=BIENES().filter(b=>b.situacion!=='Baja'&&norm([b.codigo,b.serie,b.descripcion,b.marca,b.modelo,b.inventario].join(' ')).includes(q));
+  R.bienes.forEach(b=>add(roomOfBien(b),'b'));
+  R.mats=MATS().filter(x=>norm(x.nombre).includes(q));R.mats.forEach(x=>add(S.espacios[x.espacioId]?.mapaId,'m'));
+  R.esps=ESPACIOS().filter(e=>norm([e.nombre,e.tipo,e.ubicacion].join(' ')).includes(q));R.esps.forEach(e=>add(e.mapaId,'e'));
+  R.rooms0=CROQUIS.filter(r=>norm(r.nombre+' '+r.nave).includes(q)&&!espOfRoom(r.id).length);R.rooms0.forEach(r=>(R.rooms[r.id]??={b:0,m:0,e:0,r:0}).e++);
+  if(seeAll()){R.resps=RESPS().filter(r=>norm(r.nombre).includes(q));R.resps.forEach(r=>{L('espacios').filter(e=>e.responsableId===r.id).forEach(e=>add(e.mapaId,'r'))})}
+  return R;
+ }
+ function paint(){
+  const H=hits(),q=CQS.q.trim(),fx=$('#cqFx');if(!fx)return;fx.innerHTML='';
+  svg.classList.toggle('cdim',!!q);
+  const B=BIENES().filter(b=>b.situacion!=='Baja');
+  CROQUIS.forEach(r=>{const el=$(`rect.cr[data-r="${r.id}"]`,svg);const linked=espOfRoom(r.id).length>0;
+   el.classList.toggle('nolink',!linked);el.classList.toggle('hit',!!H.rooms[r.id]);el.classList.toggle('sel',CQS.sel===r.id);
+   const prob=B.some(b=>roomOfBien(b)===r.id&&isProb(b));
+   if(prob)fx.insertAdjacentHTML('beforeend',`<circle class="cprob" cx="${r.x+4}" cy="${r.y+4}" r="3"/>`);
+   const h=H.rooms[r.id];if(h){const n=h.b+h.m||'';if(n)fx.insertAdjacentHTML('beforeend',`<g class="cbadge"><circle cx="${r.x+r.w-3}" cy="${r.y+3}" r="${String(n).length>2?8:6.5}"/><text x="${r.x+r.w-3}" y="${r.y+3}" text-anchor="middle" dominant-baseline="central">${n}</text></g>`)}});
+  const sr=CQ[CQS.sel];if(sr)fx.insertAdjacentHTML('beforeend',`<circle class="cpulse" cx="${sr.x+sr.w/2}" cy="${sr.y+sr.h/2}" r="8"/>`);
+ }
+ const hl=(t)=>{const q=CQS.q.trim();if(!q)return esc(t);const i=norm(t).indexOf(norm(q));return i<0?esc(t):esc(t.slice(0,i))+'<mark>'+esc(t.slice(i,i+q.length))+'</mark>'+esc(t.slice(i+q.length))};
+ function panel(scroll){
+  const P=$('#cqPanel');if(!P)return;const H=hits(),q=CQS.q.trim();
+  if(!CQS.sel){
+   if(!q){const B=BIENES().filter(b=>b.situacion!=='Baja'),sinUb=B.filter(b=>!roomOfBien(b)).length,nE=L('espacios').filter(e=>!e.mapaId).length;
+    P.innerHTML=`<h3>Croquis de la escuela</h3><p class="muted" style="margin:6px 0 0;font-size:14px">Toca un salón, taller, galera, prefectura u otro espacio para ver su responsable, ubicación, bienes y materiales. Usa el buscador para localizar un artículo por código, No. de serie, descripción, marca o modelo.</p>
+     <dl><dt>Lugares en el croquis</dt><dd>${CROQUIS.length}</dd><dt>Vinculados al inventario</dt><dd>${CROQUIS.length-unl()}</dd><dt>Bienes ubicados</dt><dd>${B.length-sinUb} de ${B.length}</dd></dl>
+     ${sinUb||nE?`<p class="muted" style="font-size:13px;margin-top:12px">${nE?`${nE} espacio${nE===1?'':'s'} del inventario sin lugar en el croquis (edítalos y elige "Ubicación en el croquis"). `:''}${sinUb?`${sinUb} bien${sinUb===1?'':'es'} no aparece${sinUb===1?'':'n'} en el mapa porque su espacio no está ubicado.`:''}</p>`:''}
+     ${adm&&unl()?`<p style="margin-top:12px"><button class="btn sm" onclick="linkCroquis()">${ic('plus',15)} Vincular los ${unl()} lugares sin espacio</button></p>`:''}`;return}
+   const rk=Object.entries(H.rooms).sort((a,b)=>(b[1].b+b[1].m)-(a[1].b+a[1].m));
+   const tot=H.bienes.length+H.mats.length;
+   P.innerHTML=`<h3>Resultados</h3><p class="muted" style="margin:4px 0 8px;font-size:13.5px">${tot?`${H.bienes.length} bien${H.bienes.length===1?'':'es'} y ${H.mats.length} material${H.mats.length===1?'':'es'} · `:''}${rk.length} lugar${rk.length===1?'':'es'} en el croquis${H.sinUb?` · ${H.sinUb} sin ubicación`:''}</p>
+    ${rk.length?`<div class="cqgrp">Dónde está</div><div class="cqres">${rk.map(([id,h])=>{const es=espOfRoom(id);return`<div class="cqrow" data-room="${id}"><span class="n">${h.b+h.m||'·'}</span><span class="t">${esc(cqName(id))}<small>${esc(es.map(e=>respName(e.responsableId)).filter((v,i,a)=>a.indexOf(v)===i).join(', ')||'Sin responsable')}</small></span></div>`}).join('')}</div>`:''}
+    ${H.bienes.length?`<div class="cqgrp">Bienes</div><div class="cqres">${H.bienes.slice(0,60).map(b=>`<div class="cqrow" data-code="${esc(b.codigo)}"><span class="t"><b style="font-family:Consolas,monospace;color:var(--navy)">${hl(b.codigo)}</b> ${hl(b.descripcion||'')}<small>${hl([b.marca,b.modelo].filter(Boolean).join(' · '))}${b.serie?` · S/N ${hl(b.serie)}`:''} · ${esc(espName(b.espacioId))}</small></span>${pill(b.estado,PE)}</div>`).join('')}${H.bienes.length>60?`<p class="muted" style="font-size:12.5px">Y ${H.bienes.length-60} más…</p>`:''}</div>`:''}
+    ${H.mats.length?`<div class="cqgrp">Materiales</div><div class="cqres">${H.mats.map(x=>`<div class="cqrow" data-esp="${esc(x.espacioId||'')}"><span class="n">${esc(x.cantidad??0)}</span><span class="t">${hl(x.nombre)}<small>${esc(x.unidad||'')} · ${esc(espName(x.espacioId))}</small></span></div>`).join('')}</div>`:''}
+    ${H.resps.length?`<div class="cqgrp">Responsables</div>${H.resps.map(r=>`<div class="cqrow" style="cursor:default"><span class="t">${hl(r.nombre)}<small>${esc(L('espacios').filter(e=>e.responsableId===r.id).map(e=>e.nombre).join(', ')||'Sin espacios')}</small></span></div>`).join('')}`:''}
+    ${!rk.length&&!tot&&!H.resps.length?'<div class="empty" style="padding:20px 0">Sin coincidencias.</div>':''}`;
+   bindRows(P);return}
+  const r=CQ[CQS.sel],E=espOfRoom(r.id),ids=new Set(E.map(e=>e.id));
+  const B=BIENES().filter(b=>b.situacion!=='Baja'&&ids.has(b.espacioId)),M=MATS().filter(x=>ids.has(x.espacioId)),N=NECS().filter(n=>n.estado!=='Atendida'&&ids.has(n.espacioId));
+  const qn=norm(q),mB=q?B.filter(b=>norm([b.codigo,b.serie,b.descripcion,b.marca,b.modelo,b.inventario].join(' ')).includes(qn)):[];
+  const G={};B.forEach(b=>{const k=[b.descripcion,b.marca,b.modelo].join('|');(G[k]??={b,codes:[],prob:0}).codes.push(b.codigo);if(isProb(b))G[k].prob++});
+  const conds=E.flatMap(e=>Object.values(e.condiciones||{})),cm=conds.filter(c=>c.e==='M').length,cr=conds.filter(c=>c.e==='R').length;
+  P.innerHTML=`${q?`<button class="btn sm" id="cqBack" style="margin-bottom:10px">← Volver a resultados</button>`:''}
+   <h3>${esc(r.nombre)}</h3><div class="muted" style="font-size:13px;margin-top:2px">${esc([CQT[r.t][0].replace(/s$/,'').replace('Servicios y bodega','Servicio'),r.nave].filter(Boolean).join(' · '))}</div>
+   ${E.length?E.map(e=>`<dl><dt>Espacio</dt><dd>${esc(e.nombre)}</dd><dt>Responsable</dt><dd>${esc(respName(e.responsableId))}${S.responsables[e.responsableId]?.cargo?` <span class="muted" style="font-weight:400">· ${esc(S.responsables[e.responsableId].cargo)}</span>`:''}</dd>${e.ubicacion?`<dt>Ubicación</dt><dd>${esc(e.ubicacion)}</dd>`:''}${e.turno?`<dt>Turno</dt><dd>${esc(e.turno)}</dd>`:''}</dl>`).join('<hr style="border:0;border-top:1px dashed var(--line);margin:10px 0 0">')
+    :`<div class="empty" style="padding:16px 0;text-align:left">Este lugar aún no está vinculado a un espacio del inventario.${adm?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px"><button class="btn sm pri" id="cqNew">${ic('plus',15)} Crear espacio aquí</button><button class="btn sm" id="cqLinkOne">Vincular uno existente</button></div>`:''}</div>`}
+   ${E.length?`<div class="stats" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px"><span class="pill n">${B.length} bienes</span><span class="pill n">${M.length} materiales</span>${cm?`<span class="pill r">${cm} elem. en mal estado</span>`:''}${cr?`<span class="pill a">${cr} regular</span>`:''}${N.length?`<span class="pill a">${N.length} necesidades</span>`:''}</div>`:''}
+   ${mB.length?`<h4>Coincidencias aquí (${mB.length})</h4>${mB.map(b=>`<div class="cqrow" data-code="${esc(b.codigo)}"><span class="t"><b style="font-family:Consolas,monospace;color:var(--navy)">${hl(b.codigo)}</b> ${hl(b.descripcion)}<small>${hl([b.marca,b.modelo].filter(Boolean).join(' · '))}${b.serie?` · S/N ${hl(b.serie)}`:''}</small></span>${pill(b.estado,PE)}</div>`).join('')}`:''}
+   ${E.length?`<h4>Bienes muebles (${B.length})</h4>${Object.values(G).length?Object.values(G).sort((a,b)=>b.codes.length-a.codes.length).map(g=>`<div class="cqrow" ${g.codes.length===1?`data-code="${esc(g.codes[0])}"`:`data-desc="${esc(g.b.descripcion)}"`}><span class="n">${g.codes.length}</span><span class="t">${esc(g.b.descripcion)}<small>${esc([g.b.marca,g.b.modelo].filter(Boolean).join(' · ')||codesTxt(g.codes.sort(ncmp)))}</small></span>${g.prob?`<span class="pill r">${g.prob} con problema</span>`:''}</div>`).join(''):'<div class="muted" style="font-size:13.5px">Sin bienes registrados.</div>'}
+   <h4>Materiales (${M.length})</h4>${M.length?M.map(x=>`<div class="cqrow" style="cursor:default"><span class="n">${esc(x.cantidad??0)}</span><span class="t">${esc(x.nombre)}<small>${esc(x.unidad||'')}${x.precision==='Aproximada'?' · aprox.':''}</small></span>${pill(x.estado,PE)}</div>`).join(''):'<div class="muted" style="font-size:13.5px">Sin materiales registrados.</div>'}
+   ${N.length?`<h4>Necesidades pendientes</h4>${N.map(n=>`<div class="cqrow" style="cursor:default"><span class="t">${esc(n.descripcion)}<small>${esc(n.tipo)} · prioridad ${esc(n.prioridad)}</small></span>${pill(n.estado,PN)}</div>`).join('')}`:''}
+   <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:14px"><button class="btn sm" id="cqList">${ic('box',15)} Ver en la lista</button><button class="btn sm" id="cqPrint">${ic('print',15)} Imprimir inventario</button>${E.length&&(adm||E.some(e=>e.responsableId===myR()))?`<button class="btn sm" id="cqEdit">${ic('edit',15)} ${adm?'Editar espacio':'Condiciones'}</button>`:''}${canEdit()&&E.length?`<button class="btn sm" id="cqNec">${ic('alert',15)} Necesidad</button>`:''}</div>`:''}`;
+  bindRows(P);
+  if($('#cqBack'))$('#cqBack').onclick=()=>{CQS.sel='';paint();panel()};
+  if($('#cqNew'))$('#cqNew').onclick=async()=>{const id=uid();await DB.set('espacios/'+id,{nombre:r.nombre,tipo:cqTipoEsp(r),ubicacion:r.nave||'',mapaId:r.id,condiciones:{},creado:Date.now()});toast('Espacio creado. Asígnale un responsable.','ok');espForm(id)};
+  if($('#cqLinkOne'))$('#cqLinkOne').onclick=()=>{const opt=L('espacios').sort((a,b)=>ncmp(a.nombre,b.nombre));if(!opt.length)return toast('No hay espacios registrados todavía','err');
+   const m=openModal({title:'Vincular con '+r.nombre,body:`<label>Espacio del inventario<select id="lkE">${opts(opt.map(e=>[e.id,e.nombre+(e.mapaId?` (ahora en: ${cqName(e.mapaId)})`:'')]))}</select></label>`,actions:[CANCEL,{label:'Vincular',cls:'pri',fn:async(m)=>{await DB.update('espacios/'+$('#lkE',m).value,{mapaId:r.id});closeModal(m);toast('Vinculado','ok')}}]})};
+  if($('#cqList'))$('#cqList').onclick=()=>{Object.assign(BF,{q:'',esp:E.length===1?E[0].id:'',resp:'',sit:'__act',cat:'',est:''});if(E.length>1)BF.q=r.nombre;go('bienes')};
+  if($('#cqPrint'))$('#cqPrint').onclick=()=>E.length===1?informeEsp(E[0].id):E.forEach(e=>informeEsp(e.id));
+  if($('#cqEdit'))$('#cqEdit').onclick=()=>espForm(E[0].id);
+  if($('#cqNec'))$('#cqNec').onclick=()=>necForm(null,E[0].id);
+  if(scroll&&matchMedia('(max-width:1000px)').matches)P.scrollIntoView({behavior:'smooth',block:'start'});
+ }
+ function bindRows(P){
+  $$('[data-room]',P).forEach(x=>x.onclick=()=>{CQS.sel=x.dataset.room;paint();panel(true)});
+  $$('[data-code]',P).forEach(x=>x.onclick=()=>ficha(x.dataset.code));
+  $$('[data-esp]',P).forEach(x=>x.onclick=()=>{const id=S.espacios[x.dataset.esp]?.mapaId;if(id){CQS.sel=id;paint();panel(true)}else toast('Ese espacio no tiene lugar en el croquis','err')});
+  $$('[data-desc]',P).forEach(x=>x.onclick=()=>{const E=espOfRoom(CQS.sel);Object.assign(BF,{q:x.dataset.desc,esp:E.length===1?E[0].id:'',resp:'',sit:'__act',cat:'',est:''});go('bienes')});
+ }
+ const refresh=()=>{if(!$('#cqSvg'))return;const u=$('#cqUnl');if(u)u.textContent=unl();paint();panel()};
+ paint();panel();VIEWS.espacios.refresh=refresh;
+}
+async function linkCroquis(){
+ const E=L('espacios'),used=new Set(E.map(e=>e.mapaId).filter(Boolean)),up={},auto=[],nuevos=[];
+ CROQUIS.filter(r=>!used.has(r.id)).forEach(r=>{
+  const m=E.find(e=>!e.mapaId&&!up[`espacios/${e.id}/mapaId`]&&[r.nombre,r.lab].some(n=>norm(n)===norm(e.nombre)));
+  if(m){up[`espacios/${m.id}/mapaId`]=r.id;auto.push(r.nombre)}else nuevos.push(r)});
+ if(!auto.length&&!nuevos.length)return toast('Todos los lugares del croquis ya están vinculados','ok');
+ if(!await confirmDlg(`${auto.length?`Se vincularán <b>${auto.length}</b> espacios que ya existen con el mismo nombre${nuevos.length?' y ':'.'}`:''}${nuevos.length?`se crearán <b>${nuevos.length}</b> espacios nuevos (aulas, talleres, galera, prefectura, bodegas…) ya ubicados en el croquis.`:''}<br><br>Después solo asigna el responsable de cada uno.`,'Vincular'))return;
+ nuevos.forEach(r=>up['espacios/'+uid()]={nombre:r.nombre,tipo:cqTipoEsp(r),ubicacion:r.nave||'',mapaId:r.id,condiciones:{},creado:Date.now()});
+ await DB.multi(up);toast(`${auto.length} vinculados · ${nuevos.length} creados`,'ok');
+}
+function verEnCroquis(code){const b=S.bienes[code],id=b&&roomOfBien(b);if(!id)return toast('El espacio de este bien no está ubicado en el croquis','err');ESPVIEW='mapa';CQS.q=code;CQS.sel=id;closeModal();go('espacios')}
+
+let EQ='';
+function vEspaciosLista(){
+ $('#espBody').innerHTML=`<div class="toolbar"><div class="grow">${ic('search',16)}<input id="eq" placeholder="Buscar espacio, ubicación o responsable…" value="${esc(EQ)}"></div>
   ${isAdmin()?`<button class="btn pri" id="eAdd">${ic('plus')} Nuevo espacio</button>`:''}</div><div id="eList"></div>`;
  $('#eq').oninput=debounce(e=>{EQ=$('#eq').value;list()},150);
  if($('#eAdd'))$('#eAdd').onclick=()=>espForm();
@@ -797,11 +992,11 @@ function vEspacios(){
    const nb=B.filter(b=>b.espacioId===e.id),np=nb.filter(b=>['Dañado','Faltante','En reparación'].includes(b.situacion)||b.estado==='Malo').length;
    const cond=Object.values(e.condiciones||{}),cm=cond.filter(x=>x.e==='M').length,cr=cond.filter(x=>x.e==='R').length,nn=N.filter(n=>n.espacioId===e.id).length;
    const can=isAdmin()||(canEdit()&&e.responsableId===myR());
-   return`<div class="ec"><h4>${esc(e.nombre)}</h4><div class="meta"><span>${ic('pin',14)} ${esc([e.tipo,e.ubicacion].filter(Boolean).join(' · ')||'Sin ubicación')}</span><span>${ic('user',14)} ${esc(respName(e.responsableId))}${e.turno?' · '+esc(e.turno):''}</span></div>
+   return`<div class="ec"><h4>${esc(e.nombre)}</h4><div class="meta"><span>${ic('pin',14)} ${esc([e.tipo,e.ubicacion].filter(Boolean).join(' · ')||'Sin ubicación')}</span><span>${ic('user',14)} ${esc(respName(e.responsableId))}${e.turno?' · '+esc(e.turno):''}</span>${e.mapaId?`<span style="color:var(--g)">${ic('pin',14)} En croquis: ${esc(cqName(e.mapaId))}</span>`:`<span>${ic('pin',14)} Sin lugar en el croquis</span>`}</div>
    <div class="stats"><span class="pill n">${nb.length} bienes</span><span class="pill n">${M.filter(x=>x.espacioId===e.id).length} materiales</span>${np?`<span class="pill r">${np} con problema</span>`:''}${cm?`<span class="pill r">${cm} elem. en mal estado</span>`:''}${cr?`<span class="pill a">${cr} regular</span>`:''}${nn?`<span class="pill a">${nn} necesidades</span>`:''}</div>
-   <div class="acts"><button class="btn sm" data-a="bienes" data-id="${e.id}">${ic('box',15)} Bienes</button>${can?`<button class="btn sm" data-a="edit" data-id="${e.id}">${ic('edit',15)} ${isAdmin()?'Editar':'Condiciones'}</button>`:`<button class="btn sm" data-a="ver" data-id="${e.id}">Ver condiciones</button>`}${canEdit()?`<button class="btn sm" data-a="nec" data-id="${e.id}">${ic('alert',15)} Necesidad</button>`:''}</div></div>`}).join('')}</div>`
+   <div class="acts">${e.mapaId?`<button class="btn sm" data-a="mapa" data-id="${e.id}">${ic('pin',15)} Croquis</button>`:''}<button class="btn sm" data-a="bienes" data-id="${e.id}">${ic('box',15)} Bienes</button>${can?`<button class="btn sm" data-a="edit" data-id="${e.id}">${ic('edit',15)} ${isAdmin()?'Editar':'Condiciones'}</button>`:`<button class="btn sm" data-a="ver" data-id="${e.id}">Ver condiciones</button>`}${canEdit()?`<button class="btn sm" data-a="nec" data-id="${e.id}">${ic('alert',15)} Necesidad</button>`:''}</div></div>`}).join('')}</div>`
   :`<div class="card empty">${ic('pin',42)}<div>${ESPACIOS().length?'Sin resultados.':(seeAll()?'Registra los espacios de la escuela: aulas, laboratorios, oficinas, bodegas…':'No tienes espacios asignados.')}</div></div>`;
-  $$('#eList [data-a]').forEach(b=>b.onclick=()=>{const id=b.dataset.id;({bienes:()=>{Object.assign(BF,{q:'',esp:id,resp:'',sit:'__act',cat:'',est:''});go('bienes')},edit:()=>espForm(id),ver:()=>espForm(id,true),nec:()=>necForm(null,id)})[b.dataset.a]()});
+  $$('#eList [data-a]').forEach(b=>b.onclick=()=>{const id=b.dataset.id;({mapa:()=>{ESPVIEW='mapa';CQS.q='';CQS.sel=S.espacios[id].mapaId;vEspacios()},bienes:()=>{Object.assign(BF,{q:'',esp:id,resp:'',sit:'__act',cat:'',est:''});go('bienes')},edit:()=>espForm(id),ver:()=>espForm(id,true),nec:()=>necForm(null,id)})[b.dataset.a]()});
  };
  list();VIEWS.espacios.refresh=list;
 }
@@ -813,7 +1008,8 @@ function espForm(id,ro){
   <label>Tipo<select name="tipo" ${adm?'':'disabled'}>${opts(TIPOS_ESP,e.tipo)}</select></label>
   <label>Ubicación (edificio, planta, referencia)<input name="ubicacion" value="${esc(e.ubicacion)}" ${adm?'':'readonly'}></label>
   <label>Responsable<select name="responsableId" ${adm?'':'disabled'}>${respOpts(e.responsableId)}</select></label>
-  <label>Turno<select name="turno" ${adm?'':'disabled'}>${opts(['Matutino','Mixto','Ambos'],e.turno,'—')}</select></label></div>
+  <label>Turno<select name="turno" ${adm?'':'disabled'}>${opts(['Matutino','Mixto','Ambos'],e.turno,'—')}</select></label>
+  <label class="c2">Ubicación en el croquis<select name="mapaId" ${adm?'':'disabled'}>${opts([...CROQUIS].sort((a,b)=>ncmp(a.nombre,b.nombre)).map(r=>{const o=espOfRoom(r.id).filter(x=>x.id!==id);return[r.id,r.nombre+(r.nave?` · ${r.nave}`:'')+(o.length?` (también: ${o.map(x=>x.nombre).join(', ')})`:'')]}),e.mapaId,'— Sin ubicar en el croquis —')}</select><small>Así el espacio, su responsable, bienes y materiales aparecen en el croquis.</small></label></div>
   <h3 class="sec">Condiciones físicas actuales</h3><div class="muted" style="font-size:13px;margin-bottom:6px">B = Bueno · R = Regular · M = Malo. Deja sin marcar lo que no aplique.</div>
   <div style="overflow:auto"><table class="ctab"><thead><tr><th>Elemento</th><th>Estado</th><th>Descripción</th></tr></thead><tbody>
   ${els.map((k,i)=>`<tr data-k="${esc(k)}"><td>${esc(k)}</td><td><div class="rg">${['B','R','M'].map(v=>`<label><input type="radio" name="__c${i}" value="${v}" ${cond[k]?.e===v?'checked':''} ${ro?'disabled':''}>${v}</label>`).join('')}</div></td><td><input type="text" value="${esc(cond[k]?.d)}" ${ro?'readonly':''} placeholder="Detalle (opcional)"></td></tr>`).join('')}
