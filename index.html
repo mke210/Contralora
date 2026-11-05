@@ -374,6 +374,8 @@ const PRIORIDADES=['Alta','Media','Baja'];
 const NEC_ESTADOS=['Pendiente','En proceso','Atendida'];
 const UNIDADES=['piezas','cajas','paquetes','juegos','resmas','rollos','botes','litros','kilos','metros'];
 const MOTIVOS_BAJA=['Dañado sin posibilidad de reparación','Ya no funciona','Obsoleto','Desgaste por uso','Extravío','Robo','Otro'];
+const fbKey=t=>String(t).replace(/[.#$\[\]\/]/g,'-').trim()||'x';
+const condMap=e=>{const o={};Object.entries(e?.condiciones||{}).forEach(([k,v])=>{if(v)o[v.n||k]=v});return o};
 const ROLES={admin:'Administrador (Contraloría)',responsable:'Responsable de espacio',consulta:'Solo consulta'};
 const PE={Bueno:'g',Regular:'a',Malo:'r'}, PS={'En uso':'g','En reparación':'a','Dañado':'r','Faltante':'p','Baja':'n'}, PF={'Sí':'g','No':'r'}, PP={Alta:'r',Media:'a',Baja:'n'}, PN={Pendiente:'r','En proceso':'a',Atendida:'g'};
 
@@ -1001,7 +1003,7 @@ function vEspaciosLista(){
  list();VIEWS.espacios.refresh=list;
 }
 function espForm(id,ro){
- const e=id?{...S.espacios[id]}:{tipo:'Aula',condiciones:{}};const adm=isAdmin()&&!ro;const cond=e.condiciones||{};
+ const e=id?{...S.espacios[id]}:{tipo:'Aula',condiciones:{}};const adm=isAdmin()&&!ro;const cond=condMap(e);
  const els=[...ELEMENTOS,...Object.keys(cond).filter(k=>!ELEMENTOS.includes(k))];
  const m=openModal({title:id?(ro?e.nombre:'Editar espacio'):'Nuevo espacio',wide:true,body:`<form id="fe" onsubmit="return false"><div class="fg">
   <label class="c2">Nombre del espacio *<input name="nombre" required value="${esc(e.nombre)}" ${adm?'':'readonly'} placeholder="Ej. Aula 3°A, Laboratorio de Ciencias, Dirección"></label>
@@ -1019,8 +1021,8 @@ function espForm(id,ro){
    ...(id&&isAdmin()?[{label:ic('trash')+' Eliminar',cls:'dan',fn:async(m)=>{const nb=L('bienes').filter(b=>b.espacioId===id).length;if(await confirmDlg(`¿Eliminar el espacio <b>${esc(e.nombre)}</b>?${nb?` Tiene ${nb} bienes que quedarán "Sin espacio".`:''}`,'Eliminar','dan')){await DB.remove('espacios/'+id);closeModal(m);toast('Espacio eliminado')}}}]:[]),
    CANCEL,{label:ic('check')+' Guardar',cls:'pri',fn:async(m)=>{const f=$('#fe',m);if(!f.reportValidity())return;
     const d=adm?readForm(f):{observaciones:$('[name=observaciones]',f).value.trim()};const cc={};
-    $$('.ctab tbody tr',f).forEach(tr=>{const v=$('input[type=radio]:checked',tr)?.value||'',t=$('input[type=text]',tr).value.trim();if(v||t)cc[tr.dataset.k]={e:v,d:t}});
-    d.condiciones=cc;d.actualizado=Date.now();d.actualizadoPor=ME.nombre;
+    $$('.ctab tbody tr',f).forEach(tr=>{const v=$('input[type=radio]:checked',tr)?.value||'',t=$('input[type=text]',tr).value.trim();if(v||t)cc[fbKey(tr.dataset.k)]={n:tr.dataset.k,e:v,d:t}});
+    d.condiciones=Object.keys(cc).length?cc:null;d.actualizado=Date.now();d.actualizadoPor=ME.nombre;
     if(id)await DB.update('espacios/'+id,d);else await DB.set('espacios/'+uid(),{...d,creado:Date.now()});
     closeModal(m);toast('Espacio guardado','ok')}}]});
 }
@@ -1256,7 +1258,7 @@ const codesTxt=c=>c.length<=3?c.join(', '):`${c[0]} … ${c.at(-1)} (${c.length}
 function bienesTable(B,showEsp=true){const G=grpBienes(B);return G.length?`<table><tr><th>No.</th><th>Descripción del bien</th><th>Marca / modelo / serie</th>${showEsp?'<th>Espacio</th>':''}<th>Cant.</th><th>Estado físico</th><th>¿Funciona?</th><th>Situación</th><th>Código(s) QR</th></tr>${G.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.descripcion)}${x.observaciones?`<br><i style="font-size:8pt">${esc(x.observaciones)}</i>`:''}</td><td>${esc([x.marca,x.modelo,x.codes.length===1?x.serie:''].filter(Boolean).join(' / '))}${x.inventario&&x.codes.length===1?`<br>Inv. ${esc(x.inventario)}`:''}</td>${showEsp?`<td>${esc(espName(x.espacioId))}</td>`:''}<td style="text-align:center">${x.codes.length}</td><td>${esc(x.estado||'')}</td><td>${esc(x.funciona||'')}</td><td>${esc(x.situacion||'')}</td><td style="font-size:8pt">${esc(codesTxt(x.codes))}</td></tr>`).join('')}</table>`:'<p><i>Sin bienes registrados.</i></p>'}
 const isProb=b=>b.situacion!=='Baja'&&(['Faltante','Dañado','En reparación'].includes(b.situacion)||b.estado==='Malo'||b.funciona==='No');
 function matsTable(M,showEsp=true){return M.length?`<table><tr><th>No.</th><th>Material</th><th>Cantidad</th><th>Unidad</th><th>Exacta / aprox.</th><th>Estado</th>${showEsp?'<th>Espacio</th>':''}<th>Observaciones</th></tr>${M.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.nombre)}</td><td style="text-align:center">${esc(x.cantidad??'')}</td><td>${esc(x.unidad||'')}</td><td>${esc(x.precision||'Exacta')}</td><td>${esc(x.estado||'')}</td>${showEsp?`<td>${esc(espName(x.espacioId))}</td>`:''}<td>${esc(x.observaciones||'')}</td></tr>`).join('')}</table>`:'<p><i>Sin materiales registrados.</i></p>'}
-function condTable(e){const c=e.condiciones||{},k=Object.keys(c);return k.length?`<table><tr><th>Elemento</th><th style="width:60px">Estado</th><th>Descripción</th></tr>${k.map(x=>`<tr><td>${esc(x)}</td><td style="text-align:center">${{B:'Bueno',R:'Regular',M:'Malo'}[c[x].e]||'—'}</td><td>${esc(c[x].d||'')}</td></tr>`).join('')}</table>`:'<p><i>Condiciones no registradas.</i></p>'}
+function condTable(e){const c=condMap(e),k=Object.keys(c);return k.length?`<table><tr><th>Elemento</th><th style="width:60px">Estado</th><th>Descripción</th></tr>${k.map(x=>`<tr><td>${esc(x)}</td><td style="text-align:center">${{B:'Bueno',R:'Regular',M:'Malo'}[c[x].e]||'—'}</td><td>${esc(c[x].d||'')}</td></tr>`).join('')}</table>`:'<p><i>Condiciones no registradas.</i></p>'}
 function necTable(N){return N.length?`<table><tr><th>No.</th><th>Necesidad detectada</th><th>Tipo</th><th>Prioridad</th><th>Estado</th></tr>${N.map((n,i)=>`<tr><td>${i+1}</td><td>${esc(n.descripcion)}${n.bienCodigo?` (${esc(n.bienCodigo)})`:''}</td><td>${esc(n.tipo)}</td><td>${esc(n.prioridad)}</td><td>${esc(n.estado)}</td></tr>`).join('')}</table>`:'<p><i>Sin necesidades registradas.</i></p>'}
 function informeResp(rid){
  const r=S.responsables[rid];if(!r)return;const c=cfg();
@@ -1372,7 +1374,7 @@ async function excelDB(){
   'Bienes activos':B.filter(b=>b.situacion!=='Baja').map(bien),
   'Bajas':B.filter(b=>b.situacion==='Baja').map(b=>({...bien(b),'Fecha de baja':fd(b.baja?.fecha),'Motivo de baja':b.baja?.motivo||'','Dictamen':b.baja?.desc||'','Autorizó':b.baja?.autorizo||'','Registró':b.baja?.por||''})),
   'Espacios':L('espacios').sort((a,b)=>ncmp(a.nombre,b.nombre)).map(e=>({'Espacio':e.nombre,'Tipo':e.tipo||'','Ubicación':e.ubicacion||'','Responsable':respName(e.responsableId),'Turno':e.turno||'','Bienes activos':B.filter(b=>b.espacioId===e.id&&b.situacion!=='Baja').length,'Observaciones':e.observaciones||''})),
-  'Condiciones':L('espacios').flatMap(e=>Object.entries(e.condiciones||{}).map(([k,v])=>({'Espacio':e.nombre,'Elemento':k,'Estado':{B:'Bueno',R:'Regular',M:'Malo'}[v.e]||'','Descripción':v.d||''}))),
+  'Condiciones':L('espacios').flatMap(e=>Object.entries(condMap(e)).map(([k,v])=>({'Espacio':e.nombre,'Elemento':k,'Estado':{B:'Bueno',R:'Regular',M:'Malo'}[v.e]||'','Descripción':v.d||''}))),
   'Materiales':L('materiales').sort((a,b)=>ncmp(a.nombre,b.nombre)).map(x=>({'Material':x.nombre,'Cantidad':Number(x.cantidad)||0,'Unidad':x.unidad||'','Precisión':x.precision||'','Estado':x.estado||'','Espacio':espName(x.espacioId),'Responsable':respName(x.responsableId),'Observaciones':x.observaciones||''})),
   'Necesidades':L('necesidades').map(n=>({'Espacio':espName(n.espacioId),'Descripción':n.descripcion||'','Tipo':n.tipo||'','Prioridad':n.prioridad||'','Estado':n.estado||'','Seguimiento':n.atencion||'','Bien':n.bienCodigo||'','Reportó':n.reporto||'','Fecha':fdate(n.fecha)})),
   'Responsables':L('responsables').sort((a,b)=>ncmp(a.nombre,b.nombre)).map(r=>({'Nombre':r.nombre,'Cargo':r.cargo||'','Turno':r.turno||'','Comisión / área':r.area||'','Correo':r.correo||'','Bienes activos':B.filter(b=>b.responsableId===r.id&&b.situacion!=='Baja').length})),
