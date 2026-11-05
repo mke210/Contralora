@@ -156,7 +156,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:14px}
 /* Ficha */
 .ficha{display:grid;grid-template-columns:200px 1fr;gap:20px}
 .fq{text-align:center}
-.fq svg{width:180px;height:180px;border:1px solid var(--line);border-radius:10px;padding:6px;background:#fff}
+.fq>svg{width:180px;height:180px;border:1px solid var(--line);border-radius:10px;padding:6px;background:#fff}
 .fcode{font-family:Consolas,monospace;font-weight:700;font-size:20px;color:var(--navy);margin-top:6px}
 #fFoto img{width:180px;border-radius:10px;margin-top:10px;border:1px solid var(--line)}
 .fd h2{margin:0 0 8px;font-size:21px}
@@ -376,6 +376,7 @@ const UNIDADES=['piezas','cajas','paquetes','juegos','resmas','rollos','botes','
 const MOTIVOS_BAJA=['Dañado sin posibilidad de reparación','Ya no funciona','Obsoleto','Desgaste por uso','Extravío','Robo','Otro'];
 const fbKey=t=>String(t).replace(/[.#$\[\]\/]/g,'-').trim()||'x';
 const condMap=e=>{const o={};Object.entries(e?.condiciones||{}).forEach(([k,v])=>{if(v)o[v.n||k]=v});return o};
+const COMISIONES_DEF=['Comisión de vigilancia','Sociedad de alumnos','Comisión de deportes','Comisión de acción social','Comisión de higiene y salud','Comisión de seguridad y emergencia escolar','Protección civil','Cooperativa escolar','Comisión de ceremonias y eventos cívicos','Comisión de puntualidad y asistencia','Comisión de periódico mural','Comisión de biblioteca','Banda de guerra','Escolta'];
 const ROLES={admin:'Administrador (Contraloría)',responsable:'Responsable de espacio',consulta:'Solo consulta'};
 const PE={Bueno:'g',Regular:'a',Malo:'r'}, PS={'En uso':'g','En reparación':'a','Dañado':'r','Faltante':'p','Baja':'n'}, PF={'Sí':'g','No':'r'}, PP={Alta:'r',Media:'a',Baja:'n'}, PN={Pendiente:'r','En proceso':'a',Atendida:'g'};
 
@@ -470,6 +471,7 @@ const seeAll=()=>ME&&(ME.rol==='admin'||ME.rol==='consulta');
 const canEdit=()=>ME&&ME.rol!=='consulta';
 const myR=()=>ME?.responsableId||'__none__';
 const mineB=b=>seeAll()||b.responsableId===myR()||(!b.responsableId&&S.espacios[b.espacioId]?.responsableId===myR());
+const respOf=x=>x?.responsableId||S.espacios[x?.espacioId]?.responsableId||'';
 const mineE=e=>seeAll()||e.responsableId===myR();
 const canEditB=b=>isAdmin()||(canEdit()&&mineB(b));
 const L=(col,key='id')=>Object.entries(S[col]||{}).map(([k,v])=>({...v,[key]:k}));
@@ -581,7 +583,7 @@ function vInicio(){
    ===================================================================== */
 const BF={q:'',esp:'',resp:'',sit:'__act',cat:'',est:''};
 const SEL=new Set();let BLIM=150;
-function filtB(){const q=norm(BF.q);return BIENES().filter(b=>(!BF.esp||(BF.esp==='__none'?!b.espacioId:b.espacioId===BF.esp))&&(!BF.resp||b.responsableId===BF.resp)&&(BF.sit==='__act'?b.situacion!=='Baja':(!BF.sit||b.situacion===BF.sit))&&(!BF.cat||b.categoria===BF.cat)&&(!BF.est||b.estado===BF.est)&&(!q||norm([b.codigo,b.descripcion,b.marca,b.modelo,b.serie,b.inventario,espName(b.espacioId),respName(b.responsableId),b.observaciones].join(' ')).includes(q)))}
+function filtB(){const q=norm(BF.q);return BIENES().filter(b=>(!BF.esp||(BF.esp==='__none'?!b.espacioId:b.espacioId===BF.esp))&&(!BF.resp||respOf(b)===BF.resp)&&(BF.sit==='__act'?b.situacion!=='Baja':(!BF.sit||b.situacion===BF.sit))&&(!BF.cat||b.categoria===BF.cat)&&(!BF.est||b.estado===BF.est)&&(!q||norm([b.codigo,b.descripcion,b.marca,b.modelo,b.serie,b.inventario,espName(b.espacioId),respName(respOf(b)),b.observaciones].join(' ')).includes(q)))}
 function vBienes(){
  const c=cfg();BLIM=150;
  $('#view').innerHTML=`
@@ -616,7 +618,7 @@ function vBienes(){
   if(!R.length){$('#bList').innerHTML=`<div class="card empty">${ic('box',42)}<div>${BIENES().length?'Ningún bien coincide con los filtros.':'Aún no hay bienes registrados.'}</div>${isAdmin()&&!BIENES().length?`<p><button class="btn pri" onclick="bienForm()">${ic('plus')} Registrar el primero</button></p>`:''}</div>`;return}
   const V=R.slice(0,BLIM),all=R.every(b=>SEL.has(b.codigo));
   $('#bList').innerHTML=`<div class="tw"><table class="rt"><thead><tr><th style="width:34px"><input type="checkbox" id="ckAll" ${all?'checked':''} title="Seleccionar todos los filtrados"></th><th>Código</th><th>Descripción</th><th>Categoría</th><th>Espacio</th><th>Responsable</th><th>Estado</th><th>Situación</th><th>Verificado</th></tr></thead><tbody>
-  ${V.map(b=>`<tr class="ck" data-c="${esc(b.codigo)}"><td data-l=""><input type="checkbox" class="ckb" ${SEL.has(b.codigo)?'checked':''}></td><td data-l="Código" class="code">${esc(b.codigo)}</td><td data-l="Descripción"><div>${esc(b.descripcion)}</div><div class="sub">${esc([b.marca,b.modelo].filter(Boolean).join(' · '))}</div></td><td data-l="Categoría">${esc(b.categoria||'—')}</td><td data-l="Espacio">${esc(espName(b.espacioId))}</td><td data-l="Responsable">${esc(respName(b.responsableId))}</td><td data-l="Estado">${pill(b.estado,PE)}${b.funciona==='No'?' '+pill('No funciona',{"No funciona":'r'}):''}</td><td data-l="Situación">${pill(b.situacion,PS)}</td><td data-l="Verificado" class="sub">${b.ultimaVerif?fdate(b.ultimaVerif):'—'}</td></tr>`).join('')}
+  ${V.map(b=>`<tr class="ck" data-c="${esc(b.codigo)}"><td data-l=""><input type="checkbox" class="ckb" ${SEL.has(b.codigo)?'checked':''}></td><td data-l="Código" class="code">${esc(b.codigo)}</td><td data-l="Descripción"><div>${esc(b.descripcion)}</div><div class="sub">${esc([b.marca,b.modelo].filter(Boolean).join(' · '))}</div></td><td data-l="Categoría">${esc(b.categoria||'—')}</td><td data-l="Espacio">${esc(espName(b.espacioId))}</td><td data-l="Responsable">${esc(respName(respOf(b)))}</td><td data-l="Estado">${pill(b.estado,PE)}${b.funciona==='No'?' '+pill('No funciona',{"No funciona":'r'}):''}</td><td data-l="Situación">${pill(b.situacion,PS)}</td><td data-l="Verificado" class="sub">${b.ultimaVerif?fdate(b.ultimaVerif):'—'}</td></tr>`).join('')}
   </tbody></table></div>${R.length>BLIM?`<div class="more"><button class="btn" id="bMore">Mostrar más (${R.length-BLIM} restantes)</button></div>`:''}`;
   $('#ckAll').onchange=e=>{R.forEach(b=>e.target.checked?SEL.add(b.codigo):SEL.delete(b.codigo));list()};
   $$('#bList tr.ck').forEach(tr=>{const c=tr.dataset.c;$('.ckb',tr).onclick=e=>{e.stopPropagation();e.target.checked?SEL.add(c):SEL.delete(c);list()};$('td[data-l=""]',tr).onclick=e=>{if(e.target.tagName!=='INPUT'){const k=$('.ckb',tr);k.click()}e.stopPropagation()};tr.onclick=()=>ficha(c)});
@@ -746,7 +748,7 @@ async function ficha(code){
  const m=openModal({title:'Ficha del bien',wide:true,body:`<div class="ficha"><div class="fq">${qrSVG(qrContent(code))}<div class="fcode">${esc(code)}</div><div id="fFoto"></div>${can?`<div style="display:flex;gap:6px;justify-content:center;margin-top:8px;flex-wrap:wrap"><button class="btn sm" id="fFotoCam">${ic('camera',15)} Tomar foto</button><button class="btn sm" id="fFotoIn">${ic('upload',15)} Archivo</button><button class="btn sm" id="fFotoDel" hidden>Quitar</button></div>`:''}</div>
   <div class="fd"><h2>${esc(b.descripcion)}</h2><div class="pills">${pill(b.estado,PE)} ${pill(b.situacion,PS)} ${b.funciona?pill('Funciona: '+b.funciona,{'Funciona: Sí':'g','Funciona: No':'r'}):''}</div>
   <dl><dt>Espacio</dt><dd>${esc(espName(b.espacioId))}${S.espacios[b.espacioId]?.ubicacion?` <span class="muted">· ${esc(S.espacios[b.espacioId].ubicacion)}</span>`:''}</dd>
-  <dt>Responsable</dt><dd>${esc(respName(b.responsableId))}</dd>
+  <dt>Responsable</dt><dd>${esc(respName(respOf(b)))}</dd>
   <dt>Categoría</dt><dd>${esc(b.categoria||'—')}</dd>
   ${b.marca||b.modelo?`<dt>Marca / modelo</dt><dd>${esc([b.marca,b.modelo].filter(Boolean).join(' · '))}</dd>`:''}
   <dt>No. de serie</dt><dd>${b.serie?`<b style="font-family:Consolas,monospace">${esc(b.serie)}</b>`:'<span class="muted">Sin número</span>'}</dd>
@@ -1023,7 +1025,9 @@ function espForm(id,ro){
     const d=adm?readForm(f):{observaciones:$('[name=observaciones]',f).value.trim()};const cc={};
     $$('.ctab tbody tr',f).forEach(tr=>{const v=$('input[type=radio]:checked',tr)?.value||'',t=$('input[type=text]',tr).value.trim();if(v||t)cc[fbKey(tr.dataset.k)]={n:tr.dataset.k,e:v,d:t}});
     d.condiciones=Object.keys(cc).length?cc:null;d.actualizado=Date.now();d.actualizadoPor=ME.nombre;
+    const oldR=id?(S.espacios[id]?.responsableId||''):'';
     if(id)await DB.update('espacios/'+id,d);else await DB.set('espacios/'+uid(),{...d,creado:Date.now()});
+    if(id&&adm&&d.responsableId&&d.responsableId!==oldR){const T=transferUp(id,oldR,d.responsableId);if((T.nb||T.nm)&&await confirmDlg(`¿Pasar también al resguardo de <b>${esc(respName(d.responsableId))}</b> los <b>${T.nb}</b> bien${T.nb===1?'':'es'} y <b>${T.nm}</b> material${T.nm===1?'':'es'} de este espacio?`,'Sí, pasarlos'))await DB.multi(T.up)}
     closeModal(m);toast('Espacio guardado','ok')}}]});
 }
 
@@ -1037,13 +1041,13 @@ function vMateriales(){
   ${canEdit()?`<button class="btn pri" id="mAdd">${ic('plus')} Agregar material</button>`:''}<button class="btn" id="mCsv">${ic('download')} CSV</button></div><div id="mList"></div>`;
  $('#mq').oninput=debounce(()=>{MQ=$('#mq').value;list()},150);$('#mEsp').onchange=()=>{MESP=$('#mEsp').value;list()};
  if($('#mAdd'))$('#mAdd').onclick=()=>matForm();
- const fl=()=>{const q=norm(MQ);return MATS().filter(x=>(!MESP||x.espacioId===MESP)&&(!q||norm([x.nombre,x.observaciones,espName(x.espacioId),respName(x.responsableId)].join(' ')).includes(q)))};
+ const fl=()=>{const q=norm(MQ);return MATS().filter(x=>(!MESP||x.espacioId===MESP)&&(!q||norm([x.nombre,x.observaciones,espName(x.espacioId),respName(respOf(x))].join(' ')).includes(q)))};
  $('#mCsv').onclick=()=>csvMats(fl());
  const list=()=>{const R=fl();
   $('#mList').innerHTML=R.length?`<div class="tw"><table class="rt"><thead><tr><th>Material</th><th>Cantidad</th><th>Unidad</th><th>Precisión</th><th>Estado</th><th>Espacio</th><th>Responsable</th><th></th></tr></thead><tbody>
   ${R.map(x=>{const can=isAdmin()||(canEdit()&&mineB(x));return`<tr data-id="${x.id}"><td data-l="Material"><b>${esc(x.nombre)}</b>${x.observaciones?`<div class="sub">${esc(x.observaciones)}</div>`:''}</td>
   <td data-l="Cantidad"><span class="qty">${can?`<button class="icon-btn" data-q="-1">−</button>`:''}<b>${esc(x.cantidad??0)}</b>${can?`<button class="icon-btn" data-q="1">+</button>`:''}</span></td>
-  <td data-l="Unidad">${esc(x.unidad)}</td><td data-l="Precisión">${esc(x.precision||'Exacta')}</td><td data-l="Estado">${pill(x.estado,PE)}</td><td data-l="Espacio">${esc(espName(x.espacioId))}</td><td data-l="Responsable">${esc(respName(x.responsableId))}</td>
+  <td data-l="Unidad">${esc(x.unidad)}</td><td data-l="Precisión">${esc(x.precision||'Exacta')}</td><td data-l="Estado">${pill(x.estado,PE)}</td><td data-l="Espacio">${esc(espName(x.espacioId))}</td><td data-l="Responsable">${esc(respName(respOf(x)))}</td>
   <td data-l="">${can?`<button class="icon-btn" data-e title="Editar">${ic('edit',16)}</button>`:''}</td></tr>`}).join('')}</tbody></table></div>`
   :`<div class="card empty">${ic('layers',42)}<div>Sin materiales registrados${MQ||MESP?' con esos filtros':''}.</div><div class="muted" style="font-size:13px">Ej. plumones, hojas, material de laboratorio, balones, artículos de limpieza.</div></div>`;
   $$('#mList tr[data-id]').forEach(tr=>{const id=tr.dataset.id;$$('[data-q]',tr).forEach(b=>b.onclick=async()=>{const v=Math.max(0,(Number(S.materiales[id]?.cantidad)||0)+Number(b.dataset.q));await DB.update('materiales/'+id,{cantidad:v,actualizado:Date.now(),actualizadoPor:ME.nombre})});const e=$('[data-e]',tr);if(e)e.onclick=()=>matForm(id)});
@@ -1116,23 +1120,59 @@ function vResponsables(){
  const list=()=>{const R=RESPS(),B=L('bienes').filter(b=>b.situacion!=='Baja'),E=L('espacios'),M=L('materiales');
   $('#rList').innerHTML=R.length?`<div class="tw"><table class="rt"><thead><tr><th>Nombre</th><th>Cargo / función</th><th>Turno</th><th>Espacios</th><th>Bienes</th><th>Materiales</th><th></th></tr></thead><tbody>
   ${R.map(r=>`<tr data-id="${r.id}"><td data-l="Nombre"><b>${esc(r.nombre)}</b>${r.correo?`<div class="sub">${esc(r.correo)}</div>`:''}</td><td data-l="Cargo">${esc(r.cargo||'—')}${r.area?`<div class="sub">${esc(r.area)}</div>`:''}</td><td data-l="Turno">${esc(r.turno||'—')}</td>
-  <td data-l="Espacios">${E.filter(e=>e.responsableId===r.id).length}</td><td data-l="Bienes">${B.filter(b=>b.responsableId===r.id).length}</td><td data-l="Materiales">${M.filter(x=>x.responsableId===r.id).length}</td>
+  <td data-l="Espacios">${E.filter(e=>e.responsableId===r.id).length}</td><td data-l="Bienes">${B.filter(b=>respOf(b)===r.id).length}</td><td data-l="Materiales">${M.filter(x=>respOf(x)===r.id).length}</td>
   <td data-l=""><button class="btn sm" data-a="inf">${ic('file',15)} Informe</button> ${isAdmin()?`<button class="icon-btn" data-a="ed" title="Editar">${ic('edit',16)}</button>`:''}</td></tr>`).join('')}</tbody></table></div>`
   :`<div class="card empty">${ic('users',42)}<div>Aún no hay responsables registrados.</div></div>`;
   $$('#rList tr[data-id]').forEach(tr=>$$('[data-a]',tr).forEach(b=>b.onclick=()=>b.dataset.a==='inf'?informeResp(tr.dataset.id):respForm(tr.dataset.id)));
  };
  list();VIEWS.responsables.refresh=list;
 }
+/* Pasa al nuevo responsable los bienes y materiales de un espacio (los que estaban con el responsable anterior o sin responsable) */
+function transferUp(espId,oldR,newR){
+ const up={},t=Date.now(),keep=x=>!x.responsableId||x.responsableId===oldR;let nb=0,nm=0;
+ L('bienes','codigo').filter(b=>b.espacioId===espId&&b.situacion!=='Baja'&&keep(b)&&b.responsableId!==newR).forEach(b=>{nb++;up[`bienes/${b.codigo}/responsableId`]=newR;up[`movimientos/${b.codigo}/${uid()}`]={t,u:ME.nombre,tipo:'Cambio de resguardo',det:`${respName(b.responsableId||oldR)} → ${respName(newR)}`}});
+ L('materiales').filter(x=>x.espacioId===espId&&keep(x)&&x.responsableId!==newR).forEach(x=>{nm++;up[`materiales/${x.id}/responsableId`]=newR});
+ return{up,nb,nm};
+}
+async function asignarEspacio(espId,newR,ask=true,newName){
+ const e=S.espacios[espId];if(!e)return;const oldR=e.responsableId||'';
+ const T=transferUp(espId,oldR,newR),up={...T.up};up[`espacios/${espId}/responsableId`]=newR;
+ if(ask&&(T.nb||T.nm)&&!await confirmDlg(`Se asignará <b>${esc(e.nombre)}</b> a <b>${esc(newName||respName(newR))}</b>${oldR&&oldR!==newR?` (antes: ${esc(respName(oldR))})`:''}, junto con sus <b>${T.nb}</b> bien${T.nb===1?'':'es'} y <b>${T.nm}</b> material${T.nm===1?'':'es'}. ¿Continuar?`,'Asignar'))return false;
+ await DB.multi(up);return true;
+}
 function respForm(id){
  const r=id?{...S.responsables[id]}:{};
+ const coms=[...new Set([...(cfg().comisiones||COMISIONES_DEF),...L('responsables').map(x=>x.area).filter(a=>a&&!L('espacios').some(e=>e.nombre===a))])].sort(ncmp);
+ const myE=L('espacios').filter(e=>id&&e.responsableId===id).map(e=>e.id);
+ const byName=r.area&&L('espacios').find(e=>norm(e.nombre)===norm(r.area));
+ const espSel=r.areaEspId&&S.espacios[r.areaEspId]?'esp:'+r.areaEspId:(byName?'esp:'+byName.id:'');
+ const sel=espSel||(r.area||'');
+ const espOptsHtml=L('espacios').sort((a,b)=>ncmp(a.nombre,b.nombre)).map(e=>`<option value="esp:${e.id}" ${sel==='esp:'+e.id?'selected':''}>${esc(e.nombre)}${e.responsableId&&e.responsableId!==id?` — a cargo de ${esc(respName(e.responsableId))}`:''}</option>`).join('');
+ const comOptsHtml=coms.map(c=>`<option value="${esc(c)}" ${sel===c?'selected':''}>${esc(c)}</option>`).join('');
  const m=openModal({title:id?'Editar responsable':'Nuevo responsable',body:`<form class="fg" id="fr" onsubmit="return false">
   <label class="c2">Nombre completo *<input name="nombre" required value="${esc(r.nombre)}" placeholder="Ej. Profr. José Emmanuel Chan Ibáñez"></label>
-  <label>Cargo / función<input name="cargo" value="${esc(r.cargo)}" placeholder="Docente, Prefecto, Secretaria…"></label>
+  <label>Cargo / función<input name="cargo" list="dlCargo" value="${esc(r.cargo)}" placeholder="Docente, Prefecto, Secretaria…"><datalist id="dlCargo">${[...new Set(['Docente','Docente de taller','Prefecto(a)','Secretaria','Trabajo social','Orientador(a)','Intendente','Bibliotecario(a)','Contralor(a)','Subdirector(a)','Director(a)','Educación Física',...L('responsables').map(x=>x.cargo).filter(Boolean)])].map(c=>`<option value="${esc(c)}">`).join('')}</datalist></label>
   <label>Turno<select name="turno">${opts(['Matutino','Mixto','Ambos'],r.turno,'—')}</select></label>
-  <label>Comisión o área<input name="area" value="${esc(r.area)}" placeholder="Ej. Sala de cómputo, Comisión de vigilancia"></label>
-  <label>Correo<input type="email" name="correo" value="${esc(r.correo)}"></label></form>`,
+  <label class="c2">Comisión o área<select name="__area"><option value="">— Ninguna —</option>
+   <optgroup label="Espacios de la escuela (se le asigna el espacio)">${espOptsHtml}</optgroup>
+   <optgroup label="Comisiones">${comOptsHtml}${sel&&!sel.startsWith('esp:')&&!coms.includes(sel)?`<option selected value="${esc(sel)}">${esc(sel)}</option>`:''}</optgroup>
+   ${isAdmin()?'<option value="__new">➕ Agregar otra comisión…</option>':''}</select>
+   <small id="arMsg">Si eliges un <b>espacio</b>, queda a su cargo junto con sus bienes y materiales.${myE.length?` Actualmente tiene: ${esc(myE.map(x=>S.espacios[x].nombre).join(', '))}.`:''}</small></label>
+  <label class="c2">Correo<input type="email" name="correo" value="${esc(r.correo)}"></label></form>`,
   actions:[...(id?[{label:ic('trash')+' Eliminar',cls:'dan',fn:async(m)=>{if(await confirmDlg(`¿Eliminar a <b>${esc(r.nombre)}</b>? Sus bienes y espacios quedarán "Sin asignar".`,'Eliminar','dan')){await DB.remove('responsables/'+id);closeModal(m)}}}]:[]),
-   CANCEL,{label:ic('check')+' Guardar',cls:'pri',fn:async(m)=>{const f=$('#fr',m);if(!f.reportValidity())return;const d=readForm(f);if(id)await DB.update('responsables/'+id,d);else await DB.set('responsables/'+uid(),d);closeModal(m);toast('Responsable guardado','ok')}}]});
+   CANCEL,{label:ic('check')+' Guardar',cls:'pri',fn:async(m)=>{const f=$('#fr',m);if(!f.reportValidity())return;const d=readForm(f);
+    const av=$('[name=__area]',f).value;let espId='';
+    if(av.startsWith('esp:')){espId=av.slice(4);d.area=S.espacios[espId]?.nombre||'';d.areaEspId=espId}else{d.area=av==='__new'?'':av;d.areaEspId=null}
+    const rid=id||uid();
+    if(id)await DB.update('responsables/'+id,d);else await DB.set('responsables/'+rid,d);
+    if(espId&&S.espacios[espId]?.responsableId!==rid){const ok=await asignarEspacio(espId,rid,true,d.nombre);if(ok)toast(`${S.espacios[espId]?.nombre} quedó a cargo de ${d.nombre}`,'ok')}
+    else if(espId){const T=transferUp(espId,rid,rid);/* bienes sin responsable */const up={};L('bienes','codigo').filter(b=>b.espacioId===espId&&!b.responsableId).forEach(b=>up[`bienes/${b.codigo}/responsableId`]=rid);L('materiales').filter(x=>x.espacioId===espId&&!x.responsableId).forEach(x=>up[`materiales/${x.id}/responsableId`]=rid);if(Object.keys(up).length)await DB.multi(up)}
+    closeModal(m);toast('Responsable guardado','ok')}}]});
+ const fa=$('[name=__area]',m);let prev=fa.value;
+ fa.onchange=async()=>{if(fa.value!=='__new'){prev=fa.value;const e=fa.value.startsWith('esp:')&&S.espacios[fa.value.slice(4)];$('#arMsg',m).innerHTML=e?(e.responsableId&&e.responsableId!==id?`<span style="color:var(--a)">⚠ ${esc(e.nombre)} está a cargo de ${esc(respName(e.responsableId))}. Al guardar pasará a esta persona, con sus bienes y materiales.</span>`:`${esc(e.nombre)} quedará a su cargo junto con sus bienes y materiales.`):'Comisión asignada.';return}
+  const v=await askText('Nueva comisión','Nombre de la comisión o área');if(!v){fa.value=prev;return}
+  const list=[...new Set([...(cfg().comisiones||COMISIONES_DEF),v])];await DB.update('config',{comisiones:list});
+  const o=document.createElement('option');o.value=v;o.textContent=v;fa.querySelector('optgroup[label="Comisiones"]').append(o);fa.value=v;prev=v;toast(`Comisión "${v}" agregada`,'ok')};
 }
 
 /* =====================================================================
@@ -1146,7 +1186,7 @@ function etCodes(){
  if(ET.src==='sel')return BIENES().filter(b=>SEL.has(b.codigo)).map(b=>b.codigo);
  if(ET.src==='buscar')return BIENES().filter(b=>ET.pick.has(b.codigo)).map(b=>b.codigo);
  if(ET.src==='esp')return B.filter(b=>b.espacioId===ET.esp).map(b=>b.codigo);
- if(ET.src==='resp')return B.filter(b=>b.responsableId===ET.resp).map(b=>b.codigo);
+ if(ET.src==='resp')return B.filter(b=>respOf(b)===ET.resp).map(b=>b.codigo);
  if(ET.src==='rango')return B.filter(b=>ncmp(b.codigo,ET.desde)>=0&&ncmp(b.codigo,ET.hasta)<=0).map(b=>b.codigo);
  if(ET.src==='conserie')return B.filter(b=>b.serie).map(b=>b.codigo);
  return B.map(b=>b.codigo);
@@ -1293,20 +1333,20 @@ function informeBajas(codes,desde,hasta){
  const per=desde||hasta?`Periodo: ${desde?fd(desde):'inicio'} al ${hasta?fd(hasta):'a la fecha'}`:'';
  printHTML(repHead(codes&&codes.length===1?'ACTA DE BAJA DE BIEN MUEBLE':'REPORTE DE BAJAS DE BIENES MUEBLES')+`<p style="text-align:right">${per?per+' · ':''}Fecha de emisión: ${fdLong()} · Total: ${B.length} bien${B.length===1?'':'es'}${tot?` · Valor aprox.: $${tot.toLocaleString('es-MX',{minimumFractionDigits:2})}`:''}</p>
  <p style="text-align:justify">Se hace constar que los bienes muebles que se enlistan a continuación se dan de baja del inventario de la institución por encontrarse dañados, sin funcionar o por el motivo que se indica en cada caso.</p>`+
- (B.length?`<table><tr><th>No.</th><th>Código</th><th>Descripción del bien</th><th>Marca / modelo / serie</th><th>Espacio</th><th>Resguardo</th><th>Fecha de baja</th><th>Motivo</th><th>Descripción del daño / dictamen</th></tr>${B.map((b,i)=>`<tr><td>${i+1}</td><td style="white-space:nowrap">${esc(b.codigo)}</td><td>${esc(b.descripcion)}</td><td>${esc([b.marca,b.modelo,b.serie].filter(Boolean).join(' / '))}${b.inventario?`<br>Inv. ${esc(b.inventario)}`:''}</td><td>${esc(espName(b.espacioId))}</td><td>${esc(respName(b.responsableId))}</td><td>${esc(fd(b.baja?.fecha))}</td><td>${esc(b.baja?.motivo||'')}</td><td>${esc(b.baja?.desc||b.observaciones||'')}</td></tr>`).join('')}</table>`:'<p><i>No hay bajas registradas en este periodo.</i></p>')+
+ (B.length?`<table><tr><th>No.</th><th>Código</th><th>Descripción del bien</th><th>Marca / modelo / serie</th><th>Espacio</th><th>Resguardo</th><th>Fecha de baja</th><th>Motivo</th><th>Descripción del daño / dictamen</th></tr>${B.map((b,i)=>`<tr><td>${i+1}</td><td style="white-space:nowrap">${esc(b.codigo)}</td><td>${esc(b.descripcion)}</td><td>${esc([b.marca,b.modelo,b.serie].filter(Boolean).join(' / '))}${b.inventario?`<br>Inv. ${esc(b.inventario)}`:''}</td><td>${esc(espName(b.espacioId))}</td><td>${esc(respName(respOf(b)))}</td><td>${esc(fd(b.baja?.fecha))}</td><td>${esc(b.baja?.motivo||'')}</td><td>${esc(b.baja?.desc||b.observaciones||'')}</td></tr>`).join('')}</table>`:'<p><i>No hay bajas registradas en este periodo.</i></p>')+
  `<div class="firmas"><div><b>ELABORÓ</b><br>${esc(c.contraloria||ME.nombre)}<br>Contraloría escolar</div><div><b>AUTORIZÓ</b><br>${esc(c.recibeNombre)}<br>${esc(c.recibeCargo)}</div><div><b>Vo. Bo.</b><br>${esc(c.voboNombre)}<br>${esc(c.voboCargo)}</div></div>`,'rep');
 }
 function informeProblemas(){const P=BIENES().filter(b=>b.situacion!=='Baja'&&isProb(b));
- printHTML(repHead('REPORTE DE BIENES FALTANTES, DAÑADOS O QUE REQUIEREN REPARACIÓN')+`<p style="text-align:right">Fecha: ${fdLong()} · Total: ${P.length}</p>`+(P.length?`<table><tr><th>No.</th><th>Código</th><th>Bien</th><th>Espacio</th><th>Responsable</th><th>Situación</th><th>Estado</th><th>Observaciones</th></tr>${P.map((b,i)=>`<tr><td>${i+1}</td><td>${esc(b.codigo)}</td><td>${esc(b.descripcion)}</td><td>${esc(espName(b.espacioId))}</td><td>${esc(respName(b.responsableId))}</td><td>${esc(b.situacion)}</td><td>${esc(b.estado)}${b.funciona==='No'?' / no funciona':''}</td><td>${esc(b.observaciones||'')}</td></tr>`).join('')}</table>`:'<p>No hay bienes con problema.</p>'),'rep')}
+ printHTML(repHead('REPORTE DE BIENES FALTANTES, DAÑADOS O QUE REQUIEREN REPARACIÓN')+`<p style="text-align:right">Fecha: ${fdLong()} · Total: ${P.length}</p>`+(P.length?`<table><tr><th>No.</th><th>Código</th><th>Bien</th><th>Espacio</th><th>Responsable</th><th>Situación</th><th>Estado</th><th>Observaciones</th></tr>${P.map((b,i)=>`<tr><td>${i+1}</td><td>${esc(b.codigo)}</td><td>${esc(b.descripcion)}</td><td>${esc(espName(b.espacioId))}</td><td>${esc(respName(respOf(b)))}</td><td>${esc(b.situacion)}</td><td>${esc(b.estado)}${b.funciona==='No'?' / no funciona':''}</td><td>${esc(b.observaciones||'')}</td></tr>`).join('')}</table>`:'<p>No hay bienes con problema.</p>'),'rep')}
 function informeNec(){const N=NECS().filter(n=>n.estado!=='Atendida');
  printHTML(repHead('NECESIDADES PENDIENTES DE ATENCIÓN')+`<p style="text-align:right">Fecha: ${fdLong()} · Total: ${N.length}</p>`+(N.length?`<table><tr><th>No.</th><th>Espacio</th><th>Necesidad</th><th>Tipo</th><th>Prioridad</th><th>Estado</th><th>Reportó</th><th>Fecha</th></tr>${N.map((n,i)=>`<tr><td>${i+1}</td><td>${esc(espName(n.espacioId))}</td><td>${esc(n.descripcion)}${n.atencion?`<br><i>${esc(n.atencion)}</i>`:''}</td><td>${esc(n.tipo)}</td><td>${esc(n.prioridad)}</td><td>${esc(n.estado)}</td><td>${esc(n.reporto||'')}</td><td>${fdate(n.fecha)}</td></tr>`).join('')}</table>`:'<p>No hay necesidades pendientes.</p>'),'rep')}
 
 /* CSV */
 const csvRow=a=>a.map(v=>{v=String(v??'');return/[",\n;]/.test(v)?`"${v.replace(/"/g,'""')}"`:v}).join(',');
 const csvOut=(name,h,rows)=>dl(name,'﻿'+[csvRow(h),...rows.map(csvRow)].join('\r\n'),'text/csv;charset=utf-8');
-function csvBienes(B){csvOut(`bienes_${today()}.csv`,['Código','Descripción','Categoría','Marca','Modelo','No. serie','Inventario oficial','Espacio','Ubicación','Responsable','Estado físico','Funciona','Situación','Fecha de alta','Valor','Última verificación','Observaciones'],B.map(b=>[b.codigo,b.descripcion,b.categoria,b.marca,b.modelo,b.serie,b.inventario,espName(b.espacioId),S.espacios[b.espacioId]?.ubicacion,respName(b.responsableId),b.estado,b.funciona,b.situacion,b.fechaAlta,b.valor,b.ultimaVerif?fdt(b.ultimaVerif):'',b.observaciones]))}
-function csvMats(M){csvOut(`materiales_${today()}.csv`,['Material','Cantidad','Unidad','Precisión','Estado','Espacio','Responsable','Observaciones'],M.map(x=>[x.nombre,x.cantidad,x.unidad,x.precision,x.estado,espName(x.espacioId),respName(x.responsableId),x.observaciones]))}
-function csvBajas(B){csvOut(`bajas_${today()}.csv`,['Código','Descripción','Marca','Modelo','No. serie','Espacio','Responsable','Fecha de baja','Motivo','Dictamen','Autorizó','Registró','Valor'],B.map(b=>[b.codigo,b.descripcion,b.marca,b.modelo,b.serie,espName(b.espacioId),respName(b.responsableId),b.baja?.fecha,b.baja?.motivo,b.baja?.desc,b.baja?.autorizo,b.baja?.por,b.valor]))}
+function csvBienes(B){csvOut(`bienes_${today()}.csv`,['Código','Descripción','Categoría','Marca','Modelo','No. serie','Inventario oficial','Espacio','Ubicación','Responsable','Estado físico','Funciona','Situación','Fecha de alta','Valor','Última verificación','Observaciones'],B.map(b=>[b.codigo,b.descripcion,b.categoria,b.marca,b.modelo,b.serie,b.inventario,espName(b.espacioId),S.espacios[b.espacioId]?.ubicacion,respName(respOf(b)),b.estado,b.funciona,b.situacion,b.fechaAlta,b.valor,b.ultimaVerif?fdt(b.ultimaVerif):'',b.observaciones]))}
+function csvMats(M){csvOut(`materiales_${today()}.csv`,['Material','Cantidad','Unidad','Precisión','Estado','Espacio','Responsable','Observaciones'],M.map(x=>[x.nombre,x.cantidad,x.unidad,x.precision,x.estado,espName(x.espacioId),respName(respOf(x)),x.observaciones]))}
+function csvBajas(B){csvOut(`bajas_${today()}.csv`,['Código','Descripción','Marca','Modelo','No. serie','Espacio','Responsable','Fecha de baja','Motivo','Dictamen','Autorizó','Registró','Valor'],B.map(b=>[b.codigo,b.descripcion,b.marca,b.modelo,b.serie,espName(b.espacioId),respName(respOf(b)),b.baja?.fecha,b.baja?.motivo,b.baja?.desc,b.baja?.autorizo,b.baja?.por,b.valor]))}
 function csvNec(N){csvOut(`necesidades_${today()}.csv`,['Espacio','Descripción','Tipo','Prioridad','Estado','Seguimiento','Bien','Reportó','Fecha'],N.map(n=>[espName(n.espacioId),n.descripcion,n.tipo,n.prioridad,n.estado,n.atencion,n.bienCodigo,n.reporto,fdate(n.fecha)]))}
 
 /* =====================================================================
@@ -1331,7 +1371,8 @@ function vConfig(){
   <label>Prefijo de los códigos<input name="prefijo" maxlength="5" value="${esc(c.prefijo)}"><small>Ej. BM → BM-0001. Siguiente código: <b id="nextC">…</b></small></label>
   <label>Contenido del QR<select name="qrModo">${opts([['url','Enlace a la app (se abre con la cámara del celular)'],['codigo','Solo el código']],c.qrModo)}</select></label>
   <label class="c2">Dirección web de la app (para el enlace del QR)<input name="urlBase" value="${esc(c.urlBase)}" placeholder="https://usuario.github.io/inventario/"><small>Si cambias la app de dirección, actualiza este dato y reimprime las etiquetas.</small></label>
-  <label class="c2">Categorías de bienes (una por renglón)<textarea name="__cats" rows="5">${esc(c.categorias.join('\n'))}</textarea></label>
+  <label>Categorías de bienes (una por renglón)<textarea name="__cats" rows="6">${esc(c.categorias.join('\n'))}</textarea></label>
+  <label>Comisiones (una por renglón)<textarea name="__coms" rows="6">${esc((c.comisiones||COMISIONES_DEF).join('\n'))}</textarea></label>
  </form><div class="toolbar" style="margin:12px 0 0"><button class="btn pri" id="cSave">${ic('check')} Guardar configuración</button><button class="btn" id="cSer">Generar No. de serie a los bienes que no tienen</button></div></div>
 
  <div class="card" style="margin-top:14px"><h3 class="sec" style="margin-top:0">${ic('users',16)} Usuarios con acceso</h3><div id="uBox"></div></div>
@@ -1343,7 +1384,7 @@ function vConfig(){
  <div class="card" style="margin-top:14px"><h3 class="sec" style="margin-top:0">${ic('gear',16)} Conexión</h3>
   <p style="margin:0">${cloud?`<span class="pill g">Nube (Firebase)</span> Los datos se comparten en tiempo real entre todas las computadoras y celulares.`:`<span class="pill a">Modo local</span> Los datos se guardan solo en este navegador. Para usar la app desde varios equipos, pega la configuración de Firebase al inicio del archivo <b>index.html</b> (constante <code>FIREBASE_CONFIG</code>).`}</p></div>`;
  DB.get('counters/bien').then(n=>{const e=$('#nextC');if(e)e.textContent=mkCode((n||0)+1)});
- $('#cSave').onclick=async()=>{const f=$('#fc');const d=readForm(f);d.categorias=$('[name=__cats]',f).value.split('\n').map(s=>s.trim()).filter(Boolean);d.prefijo=(d.prefijo||'BM').replace(/[^A-Za-z0-9]/g,'').toUpperCase()||'BM';await DB.update('config',d);toast('Configuración guardada','ok');$('#brSchool').textContent=d.escCorto};
+ $('#cSave').onclick=async()=>{const f=$('#fc');const d=readForm(f);d.categorias=$('[name=__cats]',f).value.split('\n').map(s=>s.trim()).filter(Boolean);d.comisiones=$('[name=__coms]',f).value.split('\n').map(s=>s.trim()).filter(Boolean);d.prefijo=(d.prefijo||'BM').replace(/[^A-Za-z0-9]/g,'').toUpperCase()||'BM';await DB.update('config',d);toast('Configuración guardada','ok');$('#brSchool').textContent=d.escCorto};
  $('#xlsOut').onclick=async e=>{e.target.disabled=true;try{await excelDB()}catch(err){toast(err.message,'err')}finally{e.target.disabled=false}};
  $('#cSer').onclick=async()=>{const sin=L('bienes','codigo').filter(b=>!b.serie).sort((a,b)=>ncmp(a.codigo,b.codigo));if(!sin.length)return toast('Todos los bienes ya tienen número de serie','ok');
   if(!await confirmDlg(`Se generará un número de serie para <b>${sin.length}</b> bien${sin.length===1?'':'es'} que no lo tienen. ¿Continuar?`,'Generar'))return;
@@ -1369,13 +1410,13 @@ async function excelDB(){
  toast('Preparando el archivo de Excel…');await loadScript(XLSXJS,'XLSX');
  const mov=await DB.get('movimientos')||{},fd=x=>x?String(x).split('-').reverse().join('/'):'';
  const B=L('bienes','codigo').sort((a,b)=>ncmp(a.codigo,b.codigo));
- const bien=b=>({'Código':b.codigo,'Descripción':b.descripcion||'','Categoría':b.categoria||'','Marca':b.marca||'','Modelo':b.modelo||'','No. de serie':b.serie||'','Inventario oficial':b.inventario||'','Espacio':espName(b.espacioId),'Ubicación':S.espacios[b.espacioId]?.ubicacion||'','Responsable':respName(b.responsableId),'Estado físico':b.estado||'','Funciona':b.funciona||'','Situación':b.situacion||'','Fecha de alta':fd(b.fechaAlta),'Valor':b.valor===''||b.valor==null?'':Number(b.valor),'Última verificación':b.ultimaVerif?fdt(b.ultimaVerif):'','Observaciones':b.observaciones||''});
+ const bien=b=>({'Código':b.codigo,'Descripción':b.descripcion||'','Categoría':b.categoria||'','Marca':b.marca||'','Modelo':b.modelo||'','No. de serie':b.serie||'','Inventario oficial':b.inventario||'','Espacio':espName(b.espacioId),'Ubicación':S.espacios[b.espacioId]?.ubicacion||'','Responsable':respName(respOf(b)),'Estado físico':b.estado||'','Funciona':b.funciona||'','Situación':b.situacion||'','Fecha de alta':fd(b.fechaAlta),'Valor':b.valor===''||b.valor==null?'':Number(b.valor),'Última verificación':b.ultimaVerif?fdt(b.ultimaVerif):'','Observaciones':b.observaciones||''});
  const sh={
   'Bienes activos':B.filter(b=>b.situacion!=='Baja').map(bien),
   'Bajas':B.filter(b=>b.situacion==='Baja').map(b=>({...bien(b),'Fecha de baja':fd(b.baja?.fecha),'Motivo de baja':b.baja?.motivo||'','Dictamen':b.baja?.desc||'','Autorizó':b.baja?.autorizo||'','Registró':b.baja?.por||''})),
   'Espacios':L('espacios').sort((a,b)=>ncmp(a.nombre,b.nombre)).map(e=>({'Espacio':e.nombre,'Tipo':e.tipo||'','Ubicación':e.ubicacion||'','Responsable':respName(e.responsableId),'Turno':e.turno||'','Bienes activos':B.filter(b=>b.espacioId===e.id&&b.situacion!=='Baja').length,'Observaciones':e.observaciones||''})),
   'Condiciones':L('espacios').flatMap(e=>Object.entries(condMap(e)).map(([k,v])=>({'Espacio':e.nombre,'Elemento':k,'Estado':{B:'Bueno',R:'Regular',M:'Malo'}[v.e]||'','Descripción':v.d||''}))),
-  'Materiales':L('materiales').sort((a,b)=>ncmp(a.nombre,b.nombre)).map(x=>({'Material':x.nombre,'Cantidad':Number(x.cantidad)||0,'Unidad':x.unidad||'','Precisión':x.precision||'','Estado':x.estado||'','Espacio':espName(x.espacioId),'Responsable':respName(x.responsableId),'Observaciones':x.observaciones||''})),
+  'Materiales':L('materiales').sort((a,b)=>ncmp(a.nombre,b.nombre)).map(x=>({'Material':x.nombre,'Cantidad':Number(x.cantidad)||0,'Unidad':x.unidad||'','Precisión':x.precision||'','Estado':x.estado||'','Espacio':espName(x.espacioId),'Responsable':respName(respOf(x)),'Observaciones':x.observaciones||''})),
   'Necesidades':L('necesidades').map(n=>({'Espacio':espName(n.espacioId),'Descripción':n.descripcion||'','Tipo':n.tipo||'','Prioridad':n.prioridad||'','Estado':n.estado||'','Seguimiento':n.atencion||'','Bien':n.bienCodigo||'','Reportó':n.reporto||'','Fecha':fdate(n.fecha)})),
   'Responsables':L('responsables').sort((a,b)=>ncmp(a.nombre,b.nombre)).map(r=>({'Nombre':r.nombre,'Cargo':r.cargo||'','Turno':r.turno||'','Comisión / área':r.area||'','Correo':r.correo||'','Bienes activos':B.filter(b=>b.responsableId===r.id&&b.situacion!=='Baja').length})),
   'Historial':Object.entries(mov).flatMap(([k,o])=>Object.values(o||{}).map(x=>({t:x.t,'Fecha':fdt(x.t),'Código':k,'Bien':S.bienes[k]?.descripcion||'(eliminado)','Movimiento':x.tipo||'','Detalle':x.det||'','Usuario':x.u||''}))).sort((a,b)=>b.t-a.t).map(({t,...r})=>r)
